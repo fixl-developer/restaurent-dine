@@ -1,0 +1,116 @@
+import { Link, NavLink } from 'react-router-dom';
+import { ShoppingCart, QrCode } from 'lucide-react';
+
+const PINK = '#E8447A';
+const TX = '#4A4A4A';
+const DARK = '#1a1a1a';
+const WHITE = '#FFFFFF';
+
+const NAV_LINKS = [
+  { label: 'Menu',    to: '/menu'    },
+  { label: 'Reserve', to: '/reserve' },
+  { label: 'Combos',  to: '/combos'  },
+];
+
+interface LandingHeaderProps {
+  brandName: string;
+  cartCount: number;
+  onOpenCart: () => void;
+}
+
+export default function LandingHeader({ brandName, cartCount, onOpenCart }: LandingHeaderProps) {
+  return (
+    <nav
+      className="flex items-center justify-between"
+      style={{
+        background: WHITE,
+        padding: 'clamp(12px, 18px, 24px) clamp(20px, 48px, 56px)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        borderBottom: '1px solid rgba(124,77,204,.08)',
+        boxShadow: '0 2px 12px rgba(0,0,0,.06)',
+      }}
+    >
+      {/* Brand */}
+      <Link
+        to="/"
+        className="font-lora italic bg-transparent border-none cursor-pointer"
+        style={{ fontSize: 'clamp(18px, 20px, 24px)', color: PINK, letterSpacing: '-0.2px', textDecoration: 'none' }}
+      >
+        {brandName}
+      </Link>
+
+      {/* Main nav */}
+      <ul className="hidden md:flex list-none items-center" style={{ gap: 'clamp(20px, 36px, 48px)' }}>
+        {NAV_LINKS.map(({ label, to }) => (
+          <li key={to}>
+            <NavLink
+              to={to}
+              style={({ isActive }) => ({
+                fontSize: 'clamp(10px, 11px, 13px)',
+                fontWeight: 600,
+                letterSpacing: '1.8px',
+                textTransform: 'uppercase',
+                color: isActive ? PINK : TX,
+                opacity: isActive ? 1 : 0.7,
+                textDecoration: 'none',
+              })}
+            >
+              {label}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+
+      {/* Right actions */}
+      <div className="flex items-center" style={{ gap: 'clamp(12px, 16px, 20px)' }}>
+        {/* Scan & Order CTA */}
+        <Link
+          to="/qr-order"
+          className="hidden sm:flex items-center gap-1.5"
+          style={{
+            fontSize: 'clamp(10px, 11px, 13px)',
+            fontWeight: 600,
+            letterSpacing: '1.8px',
+            textTransform: 'uppercase',
+            color: PINK,
+            textDecoration: 'none',
+          }}
+        >
+          <QrCode style={{ width: 14, height: 14 }} />
+          Scan &amp; Order
+        </Link>
+
+        {/* Cart */}
+        <button
+          onClick={onOpenCart}
+          className="flex items-center gap-2 bg-transparent border-none cursor-pointer"
+          style={{
+            fontSize: 'clamp(10px, 11px, 13px)',
+            fontWeight: 600,
+            letterSpacing: '1.8px',
+            textTransform: 'uppercase',
+            color: TX,
+          }}
+        >
+          <ShoppingCart style={{ width: 16, height: 16, color: PINK }} />
+          <span
+            className="flex items-center justify-center font-barlow font-bold"
+            style={{
+              background: PINK,
+              color: WHITE,
+              fontSize: 'clamp(9px, 10px, 12px)',
+              minWidth: 20,
+              height: 20,
+              borderRadius: 100,
+              padding: '0 6px',
+            }}
+          >
+            {cartCount}
+          </span>
+        </button>
+      </div>
+    </nav>
+  );
+}

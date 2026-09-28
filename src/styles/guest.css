@@ -1,0 +1,521 @@
+.guest-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px max(24px, calc((100vw - 1240px) / 2));
+  border-bottom: 1px solid #eadbdc;
+  background: #fff8ef;
+}
+.guest-header nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.guest-header nav a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0;
+}
+.guest-header nav a.active {
+  color: var(--promise-berry);
+  box-shadow: 0 2px var(--promise-berry);
+}
+.guest-menu {
+  min-height: 100dvh;
+  background: #fff8ef;
+  padding-bottom: 100px;
+}
+.guest-menu-heading {
+  max-width: 1288px;
+  margin: auto;
+  padding: 42px 24px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+.guest-menu-heading h1 {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 750;
+  letter-spacing: -1.8px;
+  line-height: 1.15;
+  margin: 12px 0;
+}
+.guest-menu-heading em {
+  color: var(--promise-berry);
+  font-family: "Dancing Script", cursive;
+  font-style: normal;
+}
+.guest-menu-heading p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #79666e;
+}
+.guest-pickup-note {
+  min-width: 235px;
+  border: 1px solid #d1e0da;
+  border-radius: 20px;
+  background: #edf2e8;
+  padding: 22px;
+}
+.guest-pickup-note strong {
+  font-size: 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #23595a;
+  margin-bottom: 10px;
+}
+.guest-pickup-note p {
+  font-size: 12px;
+}
+.guest-menu-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  background: #fff8eff7;
+  backdrop-filter: blur(12px);
+  border-block: 1px solid #eadbdc;
+}
+.guest-toolbar-inner {
+  max-width: 1288px;
+  margin: auto;
+  padding: 14px 24px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.guest-search {
+  position: relative;
+  flex-shrink: 0;
+  width: 280px;
+}
+.guest-search > svg {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  color: #806c76;
+}
+.guest-search input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #e0d2d1;
+  border-radius: 12px;
+  padding: 11px 38px;
+  font-size: 13px;
+  background: #fffdfa;
+}
+.guest-search button {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: #79666e;
+}
+.guest-categories {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+  min-width: 0;
+  padding: 2px;
+}
+.guest-categories button {
+  white-space: nowrap;
+  border-radius: 30px;
+  padding: 11px 17px;
+  min-height: 44px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #eadbdc;
+  background: #fffdfa;
+}
+.guest-categories button[aria-pressed="true"] {
+  color: white;
+  background: var(--promise-berry);
+  border-color: var(--promise-berry);
+}
+.guest-catalog {
+  max-width: 1288px;
+  margin: auto;
+  padding: 28px 24px;
+}
+.guest-catalog-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.guest-catalog-title h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.guest-catalog-title span {
+  font-size: 12px;
+  color: #806c76;
+}
+.guest-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.guest-menu-card {
+  background: #fffdfa;
+  border: 1px solid #eadbdc;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+}
+.guest-menu-card:hover {
+  box-shadow: 0 8px 24px #9e4f6410;
+}
+.guest-food-image {
+  height: 190px;
+  background: #f3e8e2;
+  overflow: hidden;
+}
+.guest-food-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.guest-food-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #ab797e;
+  background: linear-gradient(135deg, #f8e3e8, #f6efdf);
+}
+.guest-food-placeholder span {
+  font-family: "Dancing Script", cursive;
+  font-size: 27px;
+}
+.guest-menu-card:nth-child(3n + 2) .guest-food-placeholder {
+  background: linear-gradient(135deg, #e9edd4, #f6efdf);
+  color: #778253;
+}
+.guest-menu-card:nth-child(3n + 3) .guest-food-placeholder {
+  background: linear-gradient(135deg, #fde8b7, #f8e3e8);
+  color: #97754a;
+}
+.guest-food-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+.guest-food-category {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #79666e;
+  margin-bottom: 8px;
+}
+.guest-food-body h3 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+.guest-food-body > p {
+  font-size: 12px;
+  color: #79666e;
+  line-height: 1.7;
+  margin-top: 7px;
+}
+.guest-food-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.guest-food-tags span {
+  font-size: 10px;
+  border: 1px solid #d9e1ce;
+  color: #577142;
+  padding: 4px 7px;
+  border-radius: 5px;
+  background: #f2f5eb;
+}
+.guest-food-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 22px;
+}
+.guest-food-footer strong {
+  font-size: 17px;
+  font-weight: 700;
+}
+.guest-food-footer small {
+  font-size: 10px;
+  font-weight: 400;
+  color: #79666e;
+}
+.guest-food-footer button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #cfa4b1;
+  color: var(--promise-berry);
+  padding: 10px 14px;
+  min-height: 42px;
+  border-radius: 12px;
+  background: #fff8fa;
+  font-size: 12px;
+  font-weight: 700;
+}
+.guest-food-footer button:hover {
+  background: #f8e3e8;
+}
+.guest-allergy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f1eee5;
+  border-radius: 14px;
+  font-size: 12px;
+  color: #79666e;
+  padding: 18px;
+  margin-top: 24px;
+  line-height: 1.7;
+}
+.guest-allergy-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.guest-cart-button {
+  position: fixed;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 56px;
+  background: var(--promise-berry);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  box-shadow: 0 6px 24px rgba(165,29,80,0.19);
+  white-space: nowrap;
+}
+.guest-cart-button > div {
+  background: #ffffff25;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+}
+.guest-cart-button small {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.9;
+}
+.guest-menu .promise-dialog {
+  background: white;
+}
+.login-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100dvh;
+  background: var(--promise-cream);
+}
+.login-story {
+  background: #f8e3e8;
+  padding: 55px max(35px, 7vw);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #ecd3d9;
+}
+.login-story h2 {
+  font-size: clamp(38px, 4vw, 60px);
+  letter-spacing: -2px;
+  line-height: 1.15;
+  font-weight: 750;
+  margin-top: 50px;
+}
+.login-story em {
+  font-family: "Dancing Script", cursive;
+  color: var(--promise-berry);
+  font-weight: 600;
+  font-style: normal;
+}
+.login-story p {
+  font-size: 14px;
+  color: #795964;
+  line-height: 1.8;
+  max-width: 360px;
+  margin-top: 20px;
+}
+.login-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30px 0;
+  min-height: 160px;
+}
+.login-art img {
+  width: min(280px, 90%);
+  border-radius: 50%;
+  mix-blend-mode: multiply;
+  transform: rotate(-5deg);
+}
+.login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+.login-panel > div {
+  width: 100%;
+  max-width: 400px;
+}
+.login-panel h1 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin: 12px 0;
+}
+.login-panel input {
+  min-height: 48px;
+}
+.login-panel label {
+  font-size: 12px;
+  color: #6c5961;
+}
+.login-panel button[type="submit"] {
+  background: var(--promise-berry);
+  min-height: 48px;
+}
+.login-panel button[type="submit"]:hover {
+  background: var(--promise-berry-dark);
+}
+.login-panel .login-mobile-brand {
+  display: none;
+}
+@media (max-width: 1000px) {
+  .guest-menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .guest-pickup-note {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .guest-header {
+    padding: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .guest-header .promise-brand-mark {
+    display: none;
+  }
+  .guest-header nav {
+    width: 100%;
+    justify-content: center;
+    gap: 28px;
+    font-size: 12px;
+  }
+  .guest-menu-heading {
+    padding: 28px 20px;
+  }
+  .guest-menu-heading h1 {
+    letter-spacing: -1px;
+  }
+  .guest-toolbar-inner {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .guest-search {
+    width: 100%;
+  }
+  .guest-search input {
+    font-size: 16px;
+  }
+  .guest-catalog {
+    padding: 24px 16px;
+  }
+  .guest-menu-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .guest-menu-card {
+    flex-direction: row-reverse;
+    align-items: stretch;
+    border-radius: 16px;
+  }
+  .guest-food-image {
+    width: 115px;
+    height: auto;
+    min-height: 180px;
+    flex-shrink: 0;
+  }
+  .guest-food-image img {
+    height: 100%;
+    object-fit: cover;
+  }
+  .guest-food-placeholder span {
+    display: none;
+  }
+  .guest-food-body {
+    padding: 17px;
+    min-width: 0;
+  }
+  .guest-food-body h3 {
+    font-size: 16px;
+  }
+  .guest-food-footer {
+    padding-top: 16px;
+    flex-wrap: wrap;
+  }
+  .guest-food-footer strong {
+    font-size: 15px;
+  }
+  .guest-food-footer button {
+    padding: 8px 11px;
+  }
+  .guest-cart-button {
+    max-width: calc(100vw - 32px);
+    width: 360px;
+  }
+  .login-page {
+    display: block;
+  }
+  .login-story {
+    display: none;
+  }
+  .login-panel {
+    min-height: 100dvh;
+  }
+  .login-panel .login-mobile-brand {
+    display: block;
+    margin-bottom: 45px;
+  }
+  .login-panel input {
+    font-size: 16px;
+  }
+}
