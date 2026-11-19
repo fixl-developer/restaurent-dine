@@ -211,9 +211,9 @@ export default function WindowTableJourney() {
           </nav>
           <a
             href="#cafe-menu"
-            aria-label="Skip the café tour and browse categories"
+            aria-label="Skip the café tour and browse the pastry case"
           >
-            <ArrowDown size={15} /> Browse categories
+            <ArrowDown size={15} /> Pastry case
           </a>
         </div>
       </div>

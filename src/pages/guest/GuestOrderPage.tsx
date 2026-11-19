@@ -726,6 +726,7 @@ export function CustomizeModal({
         </div>
 
         <div className="px-5 py-4 space-y-5">
+          {item.description && <p className="text-sm text-gray-700">{item.description}</p>}
           {item.variants.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-gray-700 mb-2">

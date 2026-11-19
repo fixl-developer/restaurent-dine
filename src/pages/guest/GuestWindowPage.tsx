@@ -3,6 +3,11 @@ import { useCheckoutDraft } from "@/hooks/useCheckoutDraft";
 import { submitCheckout } from "@/lib/checkoutDraft";
 import { ApiError } from "@/lib/api";
 import CheckoutRecovery from "@/components/CheckoutRecovery";
+import {
+  drinksCategory,
+  hasCrepeViewer,
+  startingPrice,
+} from "@/components/counter/menuDisplay";
 import type { GuestOrderDto } from "@/lib/dto/guest";
 import CrepeViewer from "@/components/windowTable/CrepeViewer";
 import GuestHeader from "@/components/ui/GuestHeader";
@@ -62,7 +67,7 @@ export default function GuestWindowPage() {
   const [customizingItem, setCustomizingItem] = useState<PublicMenuItem | null>(
     null,
   );
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const qrSlug = params.get("qr") ?? undefined;
 
@@ -76,7 +81,6 @@ export default function GuestWindowPage() {
   const menuQuery = usePublicMenu({ channel: "window" });
 
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string | null>("all");
   const draftScope = `pickup:${qrSlug ?? "counter"}`;
   const { draft, field } = useCheckoutDraft(draftScope);
   const { cart, guestName, guestNotes, pickupAt } = draft;
@@ -98,11 +102,41 @@ export default function GuestWindowPage() {
 
   const menu = menuQuery.data;
 
+  const categories = menu?.categories ?? [];
+  const requestedCategory = params.get("category");
+  const activeCategory =
+    categories.find((c) => c.id === requestedCategory)?.id ??
+    (params.get("collection") === "drinks"
+      ? drinksCategory(categories)?.id
+      : undefined) ??
+    "all";
+
+  function setActiveCategory(id: string) {
+    setParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        next.delete("collection");
+        if (id === "all") next.delete("category");
+        else next.set("category", id);
+        return next;
+      },
+      { replace: true },
+    );
+  }
+
   useEffect(() => {
-    if (menu && !activeCategory && menu.categories.length > 0) {
-      setActiveCategory(menu.categories[0].id);
-    }
-  }, [menu, activeCategory]);
+    const id = params.get("item");
+    if (!id || !menu) return;
+    const item = menu.categories
+      .flatMap((category) => category.items)
+      .find((candidate) => candidate.id === id);
+    if (item && hasCrepeViewer(item)) setInspection(item);
+    else if (item) setCustomizingItem(item);
+    else toast.info("This item is no longer on the menu.");
+    const next = new URLSearchParams(params);
+    next.delete("item");
+    setParams(next, { replace: true });
+  }, [menu, params, setParams]);
 
   const filteredItems = useMemo(() => {
     if (!menu) return [];
@@ -470,19 +504,7 @@ export default function GuestWindowPage() {
                     }
                   </span>
                   <h3>{item.name}</h3>
-                  {[
-                    "matcha-mille-crepe",
-                    "double-matcha-creme-mille-crepe",
-                  ].some(
-                    (slug) =>
-                      slug === item.slug ||
-                      slug ===
-                        item.name
-                          .normalize("NFD")
-                          .replace(/[\u0300-\u036f]/g, "")
-                          .toLowerCase()
-                          .replace(/\s+/g, "-"),
-                  ) && (
+                  {hasCrepeViewer(item) && (
                     <button
                       className="dish-preview-link"
                       onClick={() => setInspection(item)}
@@ -505,17 +527,7 @@ export default function GuestWindowPage() {
                   <div className="guest-food-footer">
                     <strong>
                       {item.variants.length > 0 && <small>From </small>}
-                      {fmtINR(
-                        item.variants.length
-                          ? Math.min(
-                              ...item.variants.map(
-                                (v) =>
-                                  v.absolutePrice ??
-                                  item.basePrice + v.priceDelta,
-                              ),
-                            )
-                          : item.basePrice,
-                      )}
+                      {fmtINR(startingPrice(item))}
                     </strong>
                     <button onClick={() => addItem(item)}>
                       <Plus size={15} />

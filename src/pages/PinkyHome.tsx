@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { usePublicRestaurant } from "@/hooks/useRestaurant";
 import "./pinky.css";
+import CafeCounter from "@/components/counter/CafeCounter";
 import WindowTableJourney from "@/components/windowTable/WindowTableJourney";
 
 const REVIEWS = [
@@ -57,6 +58,7 @@ export default function PinkyHome() {
       </header>
       <main id="main">
         <WindowTableJourney />
+        <CafeCounter />
         <section className="pinky-section pinky-about">
           <div className="pinky-about-art">
             <img
@@ -86,83 +88,6 @@ export default function PinkyHome() {
             </p>
             <Link className="pinky-text-link" to="/menu">
               See what we make <ArrowUpRight size={18} />
-            </Link>
-          </div>
-        </section>
-        <section id="cafe-menu" className="pinky-section">
-          <div className="pinky-section-heading">
-            <div>
-              <span className="pinky-eyebrow">
-                A LITTLE SOMETHING FOR EVERY MOOD
-              </span>
-              <h2>What are you craving?</h2>
-            </div>
-            <Link className="pinky-text-link" to="/menu">
-              Explore the menu <ArrowUpRight size={18} />
-            </Link>
-          </div>
-          <div className="pinky-features">
-            <Link to="/menu" className="pinky-feature pinky-matcha">
-              <div>
-                <span>01 / MATCHA MOMENTS</span>
-                <h3>
-                  Your daily
-                  <br />
-                  green daydream.
-                </h3>
-                <p>Cream-top matcha, made for a moment of your own.</p>
-              </div>
-              <img
-                src="/brand/matcha-menu.png"
-                alt="Double matcha, matcha einspanner and banana matcha menu"
-                loading="lazy"
-                width="449"
-                height="599"
-              />
-              <span className="pinky-feature-link">
-                Explore drinks <ArrowUpRight size={20} />
-              </span>
-            </Link>
-            <Link to="/menu" className="pinky-feature pinky-mango">
-              <div>
-                <span>02 / COLORFUL SIPS</span>
-                <h3>
-                  A splash
-                  <br />
-                  of happy.
-                </h3>
-                <p>Strawberry, greens, and mango. Find your sunshine.</p>
-              </div>
-              <img
-                src="/brand/smoothies.png"
-                alt="Strawberry, kale and mango smoothie selection"
-                loading="lazy"
-                width="436"
-                height="599"
-              />
-              <span className="pinky-feature-link">
-                Explore smoothies <ArrowUpRight size={20} />
-              </span>
-            </Link>
-            <Link to="/menu" className="pinky-feature pinky-blush">
-              <div>
-                <span>03 / ANYTIME BREAKFAST</span>
-                <h3>
-                  Make it
-                  <br />a slow morning.
-                </h3>
-                <p>Bagels and sandwiches for your breakfast mood.</p>
-              </div>
-              <img
-                src="/brand/breakfast.png"
-                alt="Pinky Promise anytime breakfast menu and sandwiches"
-                loading="lazy"
-                width="365"
-                height="599"
-              />
-              <span className="pinky-feature-link">
-                Explore breakfast <ArrowUpRight size={20} />
-              </span>
             </Link>
           </div>
         </section>
