@@ -1,0 +1,389 @@
+.pinky-home .pinky-nav {
+  background: #391722;
+  color: #fff1e0;
+  max-width: none;
+  padding: 16px 5%;
+  border-bottom: 1px solid #ffffff24;
+}
+.pinky-home .pinky-nav .pinky-wordmark {
+  font:
+    500 clamp(25px, 3vw, 39px)/1 Georgia,
+    serif;
+  color: #fff4df;
+  letter-spacing: -0.055em;
+}
+.pinky-home .pinky-nav .pinky-wordmark span {
+  color: #f1d3b6;
+  font-size: 8px;
+  letter-spacing: 0.21em;
+}
+.pinky-home .pinky-nav .pinky-button {
+  background: #fff2d9;
+  color: #431d29;
+  border-radius: 4px;
+  min-height: 40px;
+  padding: 9px 18px;
+}
+.cafe-journey {
+  height: 310svh;
+  position: relative;
+  background: #654f3c;
+  color: #fff4df;
+}
+.cafe-stage {
+  --travel: 0;
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  isolation: isolate;
+  overflow: hidden;
+  background: #78553d;
+}
+.cafe-room,
+.cafe-still-frame,
+.cafe-stage > canvas,
+.cafe-shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cafe-room {
+  object-position: center 54%;
+  transform: scale(calc(1 + var(--travel) * 0.13))
+    translateX(calc(var(--travel) * -2%));
+}
+.cafe-stage > canvas {
+  z-index: 1;
+  pointer-events: none;
+}
+.cafe-shade {
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(31, 12, 15, 0.77),
+      rgba(39, 19, 17, 0.44) 27%,
+      transparent 59%
+    ),
+    linear-gradient(0deg, rgba(27, 12, 13, 0.74), transparent 19%);
+}
+.cafe-story {
+  position: absolute;
+  z-index: 3;
+  left: 5.6%;
+  top: 44%;
+  transform: translateY(-50%);
+  width: min(36%, 510px);
+  text-shadow: 0 1px 12px #1a15122b;
+}
+.cafe-chapter {
+  font:
+    600 0.7rem/1.2 Inter,
+    sans-serif;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cafe-chapter::before {
+  content: "";
+  width: 32px;
+  height: 1px;
+  background: currentColor;
+}
+.cafe-story h1 {
+  color: #fff3df;
+  font:
+    normal clamp(54px, 6.6vw, 108px)/0.98 Georgia,
+    serif;
+  letter-spacing: -0.065em;
+  margin: 21px 0 20px;
+  text-wrap: balance;
+}
+.cafe-story p {
+  font-size: clamp(14px, 1.1vw, 17px);
+  line-height: 1.65;
+  max-width: 330px;
+}
+.cafe-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+.cafe-actions a,
+.cafe-actions button,
+.cafe-primary {
+  font:
+    600 13px/1.4 Inter,
+    sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.cafe-actions a:not(.cafe-primary) {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.cafe-primary {
+  background: #fff2dd;
+  border: 1px solid #e5c8aa;
+  border-radius: 4px;
+  color: #482330;
+  padding: 10px 16px;
+  cursor: pointer;
+  text-shadow: none;
+}
+.cafe-controls {
+  position: absolute;
+  bottom: 4%;
+  left: 5.6%;
+  right: 5.6%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  z-index: 3;
+}
+.cafe-controls nav {
+  display: flex;
+  gap: 15px;
+}
+.cafe-controls button,
+.cafe-controls a {
+  color: #fff3df;
+  font-size: 12px;
+  font-weight: 600;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.cafe-controls button {
+  border: 0;
+  border-bottom: 2px solid #ffffff60;
+  background: transparent;
+}
+.cafe-controls button[aria-current] {
+  border-bottom-color: #fff0cc;
+}
+.cafe-still {
+  height: auto;
+}
+.cafe-still .cafe-stage {
+  position: relative;
+}
+.crepe-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: #291b1bd6;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow: auto;
+}
+.crepe-sheet {
+  width: min(585px, 100%);
+  position: relative;
+  color: #472532;
+  background: #fcf3e6;
+  border-radius: 14px;
+  overflow: auto;
+  max-height: 94svh;
+  box-shadow: 0 24px 80px #0004;
+}
+.crepe-close {
+  position: absolute;
+  right: 13px;
+  top: 13px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fff6e9;
+  color: #45202a;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  z-index: 1;
+}
+.crepe-stage {
+  height: clamp(190px, 41svh, 430px);
+  background: radial-gradient(ellipse at center, #e9e5ca, #b0b396);
+  position: relative;
+}
+.crepe-stage canvas,
+.crepe-stage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.crepe-stage canvas {
+  touch-action: none;
+  cursor: grab;
+}
+.crepe-stage canvas:active {
+  cursor: grabbing;
+}
+.crepe-info {
+  padding: 22px 28px 28px;
+}
+.crepe-info h2 {
+  font:
+    normal clamp(30px, 4vw, 44px)/1.05 Georgia,
+    serif;
+  letter-spacing: -0.05em;
+}
+.crepe-info p {
+  margin: 10px 0 14px;
+  color: #715553;
+  font-size: 14px;
+}
+.crepe-info .cafe-primary {
+  background: #4c2230;
+  color: #fff4e3;
+  border: 0;
+  margin-top: 12px;
+}
+.crepe-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.crepe-controls button {
+  font-size: 13px;
+  border: 1px solid #c6ada6;
+  min-height: 42px;
+  padding: 7px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+@media (max-width: 800px) {
+  .pinky-home .pinky-nav {
+    gap: 12px;
+    padding: 13px 5%;
+  }
+  .pinky-home .pinky-nav nav {
+    border-color: #ffffff30;
+    padding-top: 10px;
+  }
+  .cafe-journey:not(.cafe-still) {
+    height: 245svh;
+  }
+  .cafe-stage {
+    height: 90svh;
+  }
+  .cafe-shade {
+    background: linear-gradient(
+      0deg,
+      #28151bf5 0%,
+      #28151be8 20%,
+      #28151b8c 40%,
+      transparent 67%
+    );
+  }
+  .cafe-story {
+    top: auto;
+    bottom: 13%;
+    transform: none;
+    width: 88%;
+  }
+  .cafe-story h1 {
+    font-size: clamp(41px, 9.5vw, 65px);
+    margin: 10px 0;
+    max-width: 13ch;
+  }
+  .cafe-story p {
+    font-size: 14px;
+  }
+  .cafe-actions {
+    margin-top: 13px;
+  }
+  .cafe-controls {
+    bottom: 2%;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .cafe-controls nav {
+    gap: 12px;
+  }
+  .cafe-controls a {
+    font-size: 0;
+  }
+  .cafe-controls a svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .cafe-stage {
+    height: 100svh;
+  }
+  .cafe-story {
+    top: 40%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 50%;
+  }
+  .cafe-story h1 {
+    font-size: 39px;
+    margin: 8px 0;
+  }
+  .cafe-actions {
+    margin-top: 9px;
+  }
+}
+.dish-preview-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #69293b;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.cafe-hotspot {
+  position: absolute;
+  z-index: 3;
+  left: clamp(10%, var(--anchor-x), 88%);
+  top: var(--anchor-y);
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff3de;
+  color: #4b2130;
+  padding: 9px 14px;
+  margin-top: -12px;
+  border-radius: 32px;
+  border: 1px solid #bca991;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 15px #1f0f112b;
+  cursor: pointer;
+}
+.cafe-hotspot::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  height: 12px;
+  left: 50%;
+  border-left: 1px solid #fff3de;
+}
+@media (max-width: 800px) {
+  .cafe-hotspot {
+    display: none;
+  }
+}

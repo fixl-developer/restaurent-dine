@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { usePublicRestaurant } from "@/hooks/useRestaurant";
 import "./pinky.css";
+import WindowTableJourney from "@/components/windowTable/WindowTableJourney";
 
 const REVIEWS = [
   {
@@ -37,14 +38,10 @@ export default function PinkyHome() {
   const brand = data?.brand;
   const [joined, setJoined] = useState(false);
   return (
-    <div className="pinky-site">
+    <div className="pinky-site pinky-home">
       <a href="#main" className="pinky-skip">
         Skip to content
       </a>
-      <div className="pinky-announcement">
-        A little sweetness. A little sunshine. A pinky promise.{" "}
-        <Heart size={13} aria-hidden="true" />
-      </div>
       <header className="pinky-nav">
         <Link to="/" className="pinky-wordmark" aria-label="Pinky Promise home">
           Pinky Promise<span>CAFÉ & RESTAURANT</span>
@@ -59,57 +56,7 @@ export default function PinkyHome() {
         </Link>
       </header>
       <main id="main">
-        <section className="pinky-hero">
-          <div className="pinky-hero-copy">
-            <span className="pinky-eyebrow">YOUR EVERYDAY HAPPY PLACE</span>
-            <h1>
-              Good food.
-              <br />
-              Sweet moments.
-              <br />
-              <em>Pinky promise.</em>
-            </h1>
-            <p>
-              Matcha mornings, colorful sips, and a breakfast worth slowing down
-              for. Find your new favorite at Pinky Promise.
-            </p>
-            <div className="pinky-actions">
-              <Link className="pinky-button" to="/menu">
-                Find your favorite <ArrowUpRight size={19} />
-              </Link>
-              <Link className="pinky-text-link" to="/reserve">
-                Stay a little longer →
-              </Link>
-            </div>
-            <div className="pinky-hero-note">
-              <Heart size={17} /> A café with a little extra heart.
-            </div>
-          </div>
-          <div className="pinky-hero-art">
-            <div className="pinky-orbit" />
-            <img
-              src="/brand/logo.png"
-              alt="Pinky Promise Café & Restaurant — beach sunset and pinky-promise logo"
-              width="748"
-              height="599"
-              fetchPriority="high"
-            />
-            <span className="pinky-sticker">
-              Sip. Smile.
-              <br />
-              Repeat. ♡
-            </span>
-          </div>
-        </section>
-        <div className="pinky-ribbon" aria-label="Menu highlights">
-          <span>ANYTIME BREAKFAST</span>
-          <Heart size={19} />
-          <span>MATCHA MOMENTS</span>
-          <Heart size={19} />
-          <span>COLORFUL SIPS</span>
-          <Heart size={19} />
-          <span>YOUR HAPPY PLACE</span>
-        </div>
+        <WindowTableJourney />
         <section className="pinky-section pinky-about">
           <div className="pinky-about-art">
             <img
@@ -142,7 +89,7 @@ export default function PinkyHome() {
             </Link>
           </div>
         </section>
-        <section className="pinky-section">
+        <section id="cafe-menu" className="pinky-section">
           <div className="pinky-section-heading">
             <div>
               <span className="pinky-eyebrow">
@@ -217,49 +164,6 @@ export default function PinkyHome() {
                 Explore breakfast <ArrowUpRight size={20} />
               </span>
             </Link>
-          </div>
-        </section>
-        <section className="pinky-section">
-          <div className="pinky-section-heading">
-            <div>
-              <span className="pinky-eyebrow">THE ONES EVERYONE LOVES</span>
-              <h2>Signature favorites</h2>
-            </div>
-            <Link className="pinky-text-link" to="/menu">
-              Full menu <ArrowUpRight size={18} />
-            </Link>
-          </div>
-          <div className="pinky-gallery">
-            <figure>
-              <img
-                src="/brand/matcha-menu.png"
-                alt="Cream-top matcha"
-                loading="lazy"
-                width="449"
-                height="599"
-              />
-              <figcaption>Cream-top Matcha</figcaption>
-            </figure>
-            <figure>
-              <img
-                src="/brand/smoothies.png"
-                alt="Fruit smoothies"
-                loading="lazy"
-                width="436"
-                height="599"
-              />
-              <figcaption>Sunshine Smoothies</figcaption>
-            </figure>
-            <figure>
-              <img
-                src="/brand/breakfast.png"
-                alt="Anytime breakfast"
-                loading="lazy"
-                width="365"
-                height="599"
-              />
-              <figcaption>Anytime Breakfast</figcaption>
-            </figure>
           </div>
         </section>
         <section className="pinky-section pinky-reviews">

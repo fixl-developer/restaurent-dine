@@ -4,6 +4,7 @@ import { submitCheckout } from "@/lib/checkoutDraft";
 import { ApiError } from "@/lib/api";
 import CheckoutRecovery from "@/components/CheckoutRecovery";
 import type { GuestOrderDto } from "@/lib/dto/guest";
+import CrepeViewer from "@/components/windowTable/CrepeViewer";
 import GuestHeader from "@/components/ui/GuestHeader";
 import PageState from "@/components/ui/PageState";
 import Dialog from "@/components/ui/Dialog";
@@ -57,6 +58,7 @@ function loadStoredToken(): { token: string; phone: string } | null {
 
 export default function GuestWindowPage() {
   const fmtINR = useCurrencyFormatter();
+  const [inspection, setInspection] = useState<PublicMenuItem | null>(null);
   const [customizingItem, setCustomizingItem] = useState<PublicMenuItem | null>(
     null,
   );
@@ -88,7 +90,10 @@ export default function GuestWindowPage() {
     onPointerDown: onCartResize,
     onKeyDown: onCartResizeKey,
     reset: resetCartWidth,
-  } = useResizableWidth({ storageKey: "pinky.guestCartWidth", defaultWidth: 448 });
+  } = useResizableWidth({
+    storageKey: "pinky.guestCartWidth",
+    defaultWidth: 448,
+  });
   const [showOtpModal, setShowOtpModal] = useState(false);
 
   const menu = menuQuery.data;
@@ -294,6 +299,23 @@ export default function GuestWindowPage() {
 
   return (
     <div className="guest-menu">
+      {inspection && (
+        <CrepeViewer
+          onClose={() => setInspection(null)}
+          item={{
+            name: inspection.name,
+            description: inspection.description,
+            actionLabel:
+              inspection.variants.length || inspection.modifierGroups.length
+                ? "Customize"
+                : "Add to bag",
+            onAdd: () => {
+              setInspection(null);
+              addItem(inspection);
+            },
+          }}
+        />
+      )}
       {customizingItem && (
         <CustomizeModal
           fmt={fmtINR}
@@ -448,6 +470,26 @@ export default function GuestWindowPage() {
                     }
                   </span>
                   <h3>{item.name}</h3>
+                  {[
+                    "matcha-mille-crepe",
+                    "double-matcha-creme-mille-crepe",
+                  ].some(
+                    (slug) =>
+                      slug === item.slug ||
+                      slug ===
+                        item.name
+                          .normalize("NFD")
+                          .replace(/[\u0300-\u036f]/g, "")
+                          .toLowerCase()
+                          .replace(/\s+/g, "-"),
+                  ) && (
+                    <button
+                      className="dish-preview-link"
+                      onClick={() => setInspection(item)}
+                    >
+                      View in 3D
+                    </button>
+                  )}
                   {item.description && <p>{item.description}</p>}
                   <div className="guest-food-tags">
                     {["veg", "vegan"].includes(item.foodType) && (
