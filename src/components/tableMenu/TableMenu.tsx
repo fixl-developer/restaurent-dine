@@ -4,13 +4,14 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Coffee } from "lucide-re
 import { usePublicMenu } from "@/hooks/useGuest";
 import { useCurrencyFormatter } from "@/hooks/useCurrencyFormatter";
 import { startingPrice } from "@/components/counter/menuDisplay";
+import { PageTurn, usePageTurn } from "@/components/menuBook/PageTurn";
+import type { PublicMenuItem } from "@/lib/dto/guest";
 import DishArtwork from "@/components/menuBook/DishArtwork";
 import "./tableMenu.css";
 
 export default function TableMenu() {
   const stage = useRef<HTMLDivElement>(null);
   const [opened, setOpened] = useState(false);
-  const [direction, setDirection] = useState<"forward" | "back">("forward");
   const [selection, setSelection] = useState<string>();
   const menu = usePublicMenu({ channel: "window" });
   const formatPrice = useCurrencyFormatter();
@@ -19,6 +20,19 @@ export default function TableMenu() {
   );
   const index = Math.max(0, pages.findIndex(({ item }) => item.id === selection));
   const page = pages[index];
+  const { turn: sheet, shown } = usePageTurn(page?.item, item => pages.findIndex(entry => entry.item.id === item.id));
+  const picture = sheet?.forward ? sheet.from : page?.item;
+  const entry = sheet && !sheet.forward ? sheet.from : page?.item;
+
+  function print(item: PublicMenuItem) {
+    return <div className="tm-print">
+      <span className="tm-category">{pages.find(row => row.item.id === item.id)?.category.name}</span>
+      <h3>{item.name}</h3>
+      {item.description && <p>{item.description}</p>}
+      <strong>{item.variants.length > 0 && "From "}{formatPrice(startingPrice(item))}</strong>
+    </div>;
+  }
+
 
   useEffect(() => {
     const node = stage.current;
@@ -60,7 +74,6 @@ export default function TableMenu() {
     const next = pages[index + offset];
     if (next) {
       setOpened(true);
-      setDirection(offset > 0 ? "forward" : "back");
       setSelection(next.item.id);
     }
   }
@@ -78,32 +91,27 @@ export default function TableMenu() {
         <div className="tm-room" aria-hidden="true" />
         <div className="tm-book">
           <div className="tm-paper">
-            {page ? (
-              <div key={page.item.id} className="tm-print">
-                <span className="tm-category">{page.category.name}</span>
-                <h3>{page.item.name}</h3>
-                {page.item.description && <p>{page.item.description}</p>}
-                <strong>{page.item.variants.length > 0 && "From "}{formatPrice(startingPrice(page.item))}</strong>
-              </div>
-            ) : <div className="tm-print"><BookOpen aria-hidden="true" /><p role="status">{status}</p></div>}
+            {entry ? print(entry) : <div className="tm-print"><BookOpen aria-hidden="true" /><p role="status">{status}</p></div>}
           </div>
           <div className="tm-cover" aria-hidden="true">
             <div className="tm-cloth"><Coffee size={28} /><span>Pinky Promise</span><small>Menu</small></div>
             <div className="tm-inside">
-              {page ? <DishArtwork key={page.item.id} item={page.item} /> : <Coffee size={46} />}
+              {picture ? <DishArtwork key={picture.id} item={picture} /> : <Coffee size={46} />}
             </div>
           </div>
-          {opened && page && <div key={page.item.id} className={"tm-leaf tm-" + direction} aria-hidden="true" />}
+          {sheet && <PageTurn key={sheet.to.id} forward={sheet.forward}
+            front={<div className="tm-sheet-text">{print(sheet.forward ? sheet.from : sheet.to)}</div>}
+            back={<div className="tm-sheet-art"><DishArtwork item={sheet.forward ? sheet.to : sheet.from} /></div>} />}
         </div>
       </div>
       <div className="tm-controls">
         <div className="tm-pager" aria-label="Table menu pages" role="group">
           <button type="button" aria-label="Previous dish" disabled={index === 0} onClick={() => turn(-1)}><ArrowLeft size={18} /></button>
-          <span aria-live="polite" aria-atomic="true">{page ? <> {index + 1} / {pages.length}<span className="sr-only">, {page.item.name}</span></> : "—"}</span>
+          <span aria-live="polite" aria-atomic="true">{sheet ? "Turning…" : page ? <> {index + 1} / {pages.length}<span className="sr-only">, {page.item.name}</span></> : "—"}</span>
           <button type="button" aria-label="Next dish" disabled={index + 1 >= pages.length} onClick={() => turn(1)}><ArrowRight size={18} /></button>
         </div>
-        {page ? (
-          <Link className="tm-action" to={'/menu?' + new URLSearchParams({ item: page.item.id, category: page.category.id })} aria-label={'View ' + page.item.name + ' on the menu'}>
+        {shown ? (
+          <Link className="tm-action" to={'/menu?' + new URLSearchParams({ item: shown.id, category: shown.categoryId })} aria-label={'View ' + shown.name + ' on the menu'}>
             View dish <ArrowUpRight size={16} />
           </Link>
         ) : menu.isError && <button className="tm-action" onClick={() => menu.refetch()} disabled={menu.isFetching}>Retry menu</button>}

@@ -77,11 +77,11 @@
   border-radius: 9px 2px 2px 9px; border-left: 3px solid #304b3f;
   box-shadow: inset -10px 0 12px -8px #594a38, -3px 6px #30463a, -5px 16px 24px #24140866;
 }
-.tm-inside .mb-photo-page { height: 100%; min-height: 0; width: 100%; padding: 0; border-radius: 2px; overflow: hidden; background: #ebdec4; display: grid; place-items: center; }
-.tm-inside .mb-photo-page img { width: 100%; height: 100%; position: static; max-height: none; object-fit: cover; border-radius: 0; }
-.tm-inside .mb-cutout img { object-fit: contain; }
-.tm-inside .mb-photo-fallback { display: grid; place-content: center; justify-items: center; }
-.tm-inside .mb-photo-fallback span { font: italic clamp(14px, 2vw, 26px) Georgia, serif; }
+:is(.tm-inside, .tm-sheet-art) .mb-photo-page { height: 100%; min-height: 0; width: 100%; padding: 0; border-radius: 2px; overflow: hidden; background: #ebdec4; display: grid; place-items: center; }
+:is(.tm-inside, .tm-sheet-art) .mb-photo-page img { width: 100%; height: 100%; position: static; max-height: none; object-fit: cover; border-radius: 0; }
+:is(.tm-inside, .tm-sheet-art) .mb-cutout img { object-fit: contain; }
+:is(.tm-inside, .tm-sheet-art) .mb-photo-fallback { display: grid; place-content: center; justify-items: center; }
+:is(.tm-inside, .tm-sheet-art) .mb-photo-fallback span { font: italic clamp(14px, 2vw, 26px) Georgia, serif; }
 .tm-controls { padding-top: 14px; }
 .tm-pager { gap: 12px; }
 .tm-pager span { font-size: 13px; font-variant-numeric: tabular-nums; }
@@ -102,17 +102,7 @@
   .tm-cover, .tm-stage[data-open="true"] .tm-cover { transform: translateZ(1px) rotateY(-180deg); }
   .tm-room, .tm-book, .tm-print { transform: none; animation: none; }
 }
-.tm-leaf {
-  position: absolute; inset: 0 0 0 50%; border-radius: 2px 9px 9px 2px;
-  background: linear-gradient(95deg, #cdbb9c, #f9efdc 14%, #e4d1ac);
-  transform-origin: left center; opacity: 0; pointer-events: none;
-  animation: tm-turn .5s ease-in-out;
-}
-.tm-back { animation-direction: reverse; }
-@keyframes tm-turn {
-  0% { transform: translateZ(3px) rotateY(0); opacity: 0; }
-  16% { opacity: .96; }
-  84% { opacity: .96; }
-  100% { transform: translateZ(3px) rotateY(-180deg); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) { .tm-leaf { display: none; } }
+
+.tm-sheet-art, .tm-sheet-text { display: grid; place-items: center; padding: 6%; background: #f6ecd8; }
+.tm-sheet-text { padding: 12%; }
+.tm-sheet-art { grid-template: minmax(0,1fr) / minmax(0,1fr); }

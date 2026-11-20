@@ -455,7 +455,7 @@ export default function GuestWindowPage() {
           />
         )}
         {menuView === "book" ? (
-          <MenuBook key={JSON.stringify([activeCategory, search])} items={filteredItems} categories={categories}
+          <MenuBook collection={JSON.stringify([activeCategory, search])} items={filteredItems} categories={categories}
             formatPrice={fmtINR} quantities={quantities} onAdd={addItem} onInspect={setInspection} />
         ) : (
         <div className="guest-menu-grid">

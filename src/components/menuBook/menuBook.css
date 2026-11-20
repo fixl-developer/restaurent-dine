@@ -52,13 +52,6 @@
 .mb-order small { font: .875rem system-ui,sans-serif; }
 .mb-order button { min-height: 44px; padding: .6rem 1rem; gap: .4rem; background: #552435; color: white; border-radius: 2rem; }
 .mb-order .mb-inspect { background: transparent; color: #552435; text-decoration: underline; padding-inline: 0; }
-.mb-leaf { position: absolute; inset: 0 0 0 50%; transform-origin: left center; transform-style: preserve-3d; pointer-events: none; }
-.mb-face { position: absolute; inset: 0; backface-visibility: hidden; overflow: hidden; }
-.mb-back { transform: rotateY(180deg); }
-.mb-face > div { height: 100%; }
-.mb-next { animation: mb-turn .55s ease-in-out both; }
-.mb-prev { animation: mb-turn .55s ease-in-out both reverse; }
-@keyframes mb-turn { from { transform: rotateY(0); } to { transform: rotateY(-180deg); } }
 .mb-pager { justify-content: center; gap: 1rem; margin: 1.25rem auto 0; color: #fff4e6; font-size: .9rem; }
 .mb-pager button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #b49191; border-radius: 50%; }
 .mb-pager button[aria-disabled="true"] { opacity: .4; cursor: default; }
@@ -70,15 +63,8 @@
   .mb-spread { grid-template-columns: 1fr; }
   .mb-photo-page { min-height: 0; height: clamp(10rem, 53vw, 18rem); }
   .mb-details { padding: 1rem 1.25rem 1.4rem; }
-  .mb-leaf { display: none; }
   .mb-pager { margin-top: .8rem; }
 }
-@media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
-  .mb-spread:has(.mb-leaf) { animation: mb-open .24s ease-out; transform-origin: left center; }
-  @keyframes mb-open { from { transform: perspective(900px) rotateY(-7deg); } to { transform: none; } }
-}
-@media (prefers-reduced-motion: reduce) { .mb-leaf { display: none; } }
-
 .mb-cutout { align-content: end; justify-items: center; isolation: isolate; }
 .mb-cutout img {
   object-fit: contain;
@@ -102,3 +88,48 @@
 @media (max-width: 640px) {
   .guest-food-image .mb-lift-control { padding-inline: .5rem; font-size: .875rem; }
 }
+
+.mb-table {
+  background: linear-gradient(110deg, #2d201ac9, #40261dbd), url('/window-table/cafe.webp') center 75% / cover;
+}
+.mb-binding {
+  padding: 6px 8px 11px; background: linear-gradient(90deg, #304d3e, #182f26 50%, #34533f);
+  box-shadow: 0 3px 0 #162b22, 0 20px 38px -12px #160d09;
+}
+.mb-spread { box-shadow: 0 2px #d1bea0, 0 4px #f9edcf, 0 6px #b49a75; }
+.mb-category { text-transform: uppercase; font-size: .69rem; letter-spacing: .16em; }
+.mb-text-page { display: grid; }
+.mb-mobile-base, .mb-mobile-sheet { display: none; }
+@media (max-width: 640px) {
+  .mb-spread { overflow: clip; }
+  .mb-spread .book-leaf { display: none; }
+  .mb-mobile-base, .mb-mobile-sheet {
+    display: flex; flex-direction: column; position: absolute; inset: 0;
+    pointer-events: none; background: #fff6e7; overflow: hidden;
+  }
+  .mb-mobile-base { z-index: 1; }
+  .mb-mobile-sheet { z-index: 2; transform-origin: left center; backface-visibility: hidden; }
+  .mb-mobile-sheet .mb-details, .mb-mobile-base .mb-details { flex: 1; }
+  .mb-mobile-sheet .mb-photo-page, .mb-mobile-base .mb-photo-page { flex-shrink: 0; }
+  .mb-out { animation: mobile-page 760ms ease-in-out both; }
+  .mb-in { animation: mobile-page 760ms ease-in-out both reverse; }
+  @keyframes mobile-page {
+    from { transform: perspective(1100px) rotateY(0); }
+    to { transform: perspective(1100px) rotateY(-96deg); }
+  }
+}
+.mb-dish-rail {
+  max-width: 62rem; margin: 1.15rem auto 0; padding: 3px 2px .5rem;
+  position: relative; display: flex; gap: .5rem; overflow-x: auto; overscroll-behavior-x: contain;
+  scrollbar-width: thin; scrollbar-color: #bba694 transparent;
+}
+.mb-dish-rail button {
+  display: flex; align-items: center; gap: .55rem; flex: 0 0 auto; max-width: min(15rem,70vw);
+  min-height: 46px; padding: .3rem .65rem .3rem .32rem; border: 1px solid #cfb8a58c;
+  border-radius: 4px; background: #352721; color: #fff6e9; text-align: left; font-size: .82rem;
+}
+.mb-dish-rail button[aria-current=page] { background: #fcf2de; color: #352a24; border-color: #f3dba7; }
+.mb-thumb { width: 34px; height: 34px; position: relative; display: grid; place-items: center; flex-shrink: 0; background: #decbb3; color: #684d3b; overflow: hidden; }
+.mb-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.mb-dish-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mb-dish-rail small { opacity: .75; font-variant-numeric: tabular-nums; }
