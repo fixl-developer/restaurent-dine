@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Plus, Rotate3d, Utensils } from "lucide-react";
-import { hasCrepeViewer, startingPrice } from "@/components/counter/menuDisplay";
+import { ChevronLeft, ChevronRight, Plus, Rotate3d } from "lucide-react";
+import { hasDishModel, startingPrice } from "@/components/counter/menuDisplay";
 import type { PublicCategory, PublicMenuItem } from "@/lib/dto/guest";
+import DishArtwork from "./DishArtwork";
 import "./menuBook.css";
 
 type Props = {
@@ -12,35 +13,6 @@ type Props = {
   onAdd: (item: PublicMenuItem) => void;
   onInspect: (item: PublicMenuItem) => void;
 };
-
-function DishPhoto({ item }: { item: PublicMenuItem }) {
-  const [failedUrl, setFailedUrl] = useState<string>();
-  return (
-    <div className="mb-photo-page"
-      onPointerMove={(event) => {
-        if (event.pointerType !== "mouse") return;
-        const page = event.currentTarget;
-        const bounds = page.getBoundingClientRect();
-        page.style.setProperty("--photo-x", `${((event.clientX - bounds.left) / bounds.width - 0.5) * 7}deg`);
-        page.style.setProperty("--photo-y", `${(0.5 - (event.clientY - bounds.top) / bounds.height) * 7}deg`);
-      }}
-      onPointerLeave={(event) => {
-        event.currentTarget.style.removeProperty("--photo-x");
-        event.currentTarget.style.removeProperty("--photo-y");
-      }}
-    >
-      {item.imageUrl && item.imageUrl !== failedUrl ? (
-        <img src={item.imageUrl} alt={item.name} draggable={false}
-          onError={() => setFailedUrl(item.imageUrl)} />
-      ) : (
-        <div className="mb-photo-fallback" aria-label="Dish photo unavailable">
-          <Utensils size={50} strokeWidth={1} />
-          <span>Pinky Promise</span>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function MenuBook({ items, categories, formatPrice, quantities, onAdd, onInspect }: Props) {
   const [selectedId, setSelectedId] = useState(items[0]?.id);
@@ -85,7 +57,7 @@ export default function MenuBook({ items, categories, formatPrice, quantities, o
           <button type="button" tabIndex={decorative ? -1 : 0} onClick={() => onAdd(item)}>
             <Plus size={16} /> {quantity ? `Add again · ${quantity} in bag` : "Add to bag"}
           </button>
-          {hasCrepeViewer(item) && (
+          {hasDishModel(item) && (
             <button type="button" className="mb-inspect" tabIndex={decorative ? -1 : 0} onClick={() => onInspect(item)}>
               <Rotate3d size={17} /> View dish in 3D
             </button>
@@ -116,12 +88,12 @@ export default function MenuBook({ items, categories, formatPrice, quantities, o
         if (Math.abs(dx) > 55 && Math.abs(dx) > 1.6 * Math.abs(dy)) move(dx < 0 ? 1 : -1);
       }}>
         <div className="mb-spread" key={current.id}>
-          <DishPhoto item={current} />
+          <DishArtwork item={current} interactive />
           {details(current)}
           {liveTurn && (
             <div className={'mb-leaf ' + (liveTurn.forward ? 'mb-next' : 'mb-prev')} aria-hidden="true" inert>
               <div className="mb-face mb-front">{details(liveTurn.forward ? liveTurn.from : current, true)}</div>
-              <div className="mb-face mb-back"><DishPhoto item={liveTurn.forward ? current : liveTurn.from} /></div>
+              <div className="mb-face mb-back"><DishArtwork item={liveTurn.forward ? current : liveTurn.from} /></div>
             </div>
           )}
         </div>

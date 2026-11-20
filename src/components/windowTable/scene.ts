@@ -1,9 +1,28 @@
 import * as T from "three";
 import { furnishedTable, platedCrepe } from "./models";
 
+function disposeMeshes(object: T.Object3D) {
+  const materials = new Set<T.Material>();
+  object.traverse((node) => {
+    if (node instanceof T.Mesh) {
+      node.geometry.dispose();
+      for (const m of Array.isArray(node.material)
+        ? node.material
+        : [node.material])
+        materials.add(m);
+      if (node instanceof T.InstancedMesh) node.dispose();
+    }
+  });
+  for (const material of materials) {
+    for (const value of Object.values(material))
+      if (value instanceof T.Texture) value.dispose();
+    material.dispose();
+  }
+}
+
 export function createScene(
   canvas: HTMLCanvasElement,
-  mode: "room" | "dish",
+  mode: "room" | "dish" | "model",
   onAnchor?: (x: number, y: number) => void,
 ) {
   const renderer = new T.WebGLRenderer({
@@ -23,8 +42,11 @@ export function createScene(
   const repaint = () => {
     if (!disposed) draw();
   };
+  const loaderManager = new T.LoadingManager();
+  let modelRadius = 0.5;
+  let modelCenterY = 0.13;
   const content =
-    mode === "room" ? furnishedTable(repaint) : platedCrepe(repaint);
+    mode === "model" ? new T.Group() : mode === "room" ? furnishedTable(repaint) : platedCrepe(repaint);
   scene.add(content);
   scene.add(new T.HemisphereLight(0xfff3dc, 0xa17f6b, 1.75));
   const sun = new T.DirectionalLight(0xffebce, 2.15);
@@ -103,13 +125,16 @@ export function createScene(
         1.6,
       );
     } else {
-      const distance = camera.aspect < 1 ? 1.76 : 1.43;
+      const vertical = T.MathUtils.degToRad(camera.fov / 2);
+      const halfAngle = Math.min(vertical, Math.atan(Math.tan(vertical) * camera.aspect));
+      const distance = mode === "model" ? 1.12 * modelRadius / Math.sin(halfAngle)
+        : camera.aspect < 1 ? 1.76 : 1.43;
       camera.position.set(
         distance * Math.sin(yaw) * Math.cos(pitch),
-        0.13 + distance * Math.sin(pitch),
+        modelCenterY + distance * Math.sin(pitch),
         distance * Math.cos(yaw) * Math.cos(pitch),
       );
-      camera.lookAt(0, 0.13, 0);
+      camera.lookAt(0, modelCenterY, 0);
     }
     renderer.render(scene, camera);
     if (onAnchor) {
@@ -132,6 +157,29 @@ export function createScene(
   observer.observe(canvas);
   resize();
   return {
+    async loadModel(url: string) {
+      const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
+      if (disposed) return;
+      const { scene: model } = await new GLTFLoader(loaderManager).loadAsync(url);
+      if (disposed) {
+        disposeMeshes(model);
+        return;
+      }
+      content.add(model);
+      const bounds = new T.Box3().setFromObject(model, true);
+      const sphere = bounds.getBoundingSphere(new T.Sphere());
+      if (!Number.isFinite(sphere.radius) || sphere.radius <= 0) throw new Error("Empty dish model");
+      const scale = 0.5 / sphere.radius;
+      content.scale.setScalar(scale);
+      content.position.set(-sphere.center.x, -bounds.min.y, -sphere.center.z).multiplyScalar(scale);
+      modelRadius = sphere.radius * scale;
+      modelCenterY = (sphere.center.y - bounds.min.y) * scale;
+      model.traverse((node) => {
+        if (node instanceof T.Mesh) node.castShadow = true;
+      });
+      renderer.shadowMap.needsUpdate = true;
+      resize();
+    },
     move(value: number) {
       progress = value;
       draw();
@@ -144,22 +192,8 @@ export function createScene(
     dispose() {
       disposed = true;
       observer.disconnect();
-      const materials = new Set<T.Material>();
-      scene.traverse((node) => {
-        if (node instanceof T.Mesh) {
-          node.geometry.dispose();
-          for (const m of Array.isArray(node.material)
-            ? node.material
-            : [node.material])
-            materials.add(m);
-          if (node instanceof T.InstancedMesh) node.dispose();
-        }
-      });
-      for (const material of materials) {
-        for (const value of Object.values(material))
-          if (value instanceof T.Texture) value.dispose();
-        material.dispose();
-      }
+      loaderManager.abort();
+      disposeMeshes(scene);
       sun.shadow.dispose();
       renderer.dispose();
     },

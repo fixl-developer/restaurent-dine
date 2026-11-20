@@ -4,14 +4,16 @@ import { submitCheckout } from "@/lib/checkoutDraft";
 import { ApiError } from "@/lib/api";
 import CheckoutRecovery from "@/components/CheckoutRecovery";
 import {
+  dishCutout,
   drinksCategory,
-  hasCrepeViewer,
+  hasDishModel,
   startingPrice,
 } from "@/components/counter/menuDisplay";
 import type { GuestOrderDto } from "@/lib/dto/guest";
 import CategoryRail from "@/components/menuBook/CategoryRail";
+import DishArtwork from "@/components/menuBook/DishArtwork";
 import MenuBook from "@/components/menuBook/MenuBook";
-import CrepeViewer from "@/components/windowTable/CrepeViewer";
+import DishViewer from "@/components/windowTable/DishViewer";
 import GuestHeader from "@/components/ui/GuestHeader";
 import PageState from "@/components/ui/PageState";
 import Dialog from "@/components/ui/Dialog";
@@ -133,7 +135,7 @@ export default function GuestWindowPage() {
     const item = menu.categories
       .flatMap((category) => category.items)
       .find((candidate) => candidate.id === id);
-    if (item && hasCrepeViewer(item)) setInspection(item);
+    if (item && hasDishModel(item)) setInspection(item);
     else if (item) setCustomizingItem(item);
     else toast.info("This item is no longer on the menu.");
     const next = new URLSearchParams(params);
@@ -343,19 +345,12 @@ export default function GuestWindowPage() {
   return (
     <div className="guest-menu">
       {inspection && (
-        <CrepeViewer
+        <DishViewer
+          dish={inspection}
           onClose={() => setInspection(null)}
-          item={{
-            name: inspection.name,
-            description: inspection.description,
-            actionLabel:
-              inspection.variants.length || inspection.modifierGroups.length
-                ? "Customize"
-                : "Add to bag",
-            onAdd: () => {
-              setInspection(null);
-              addItem(inspection);
-            },
+          onAdd={() => {
+            setInspection(null);
+            addItem(inspection);
           }}
         />
       )}
@@ -469,7 +464,9 @@ export default function GuestWindowPage() {
             return (
               <article className="guest-menu-card" key={item.id}>
                 <div className="guest-food-image">
-                  {item.imageUrl ? (
+                  {dishCutout(item) ? (
+                    <DishArtwork item={item} interactive />
+                  ) : item.imageUrl ? (
                     <img src={item.imageUrl} alt={item.name} loading="lazy" />
                   ) : (
                     <div className="guest-food-placeholder" aria-hidden="true">
@@ -486,7 +483,7 @@ export default function GuestWindowPage() {
                     }
                   </span>
                   <h3>{item.name}</h3>
-                  {hasCrepeViewer(item) && (
+                  {hasDishModel(item) && (
                     <button
                       className="dish-preview-link"
                       onClick={() => setInspection(item)}

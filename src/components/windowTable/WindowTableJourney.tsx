@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight, Rotate3d } from "lucide-react";
 import { Link } from "react-router-dom";
-import CrepeViewer from "./CrepeViewer";
+import DishViewer from "./DishViewer";
 import type { createScene } from "./scene";
 import "./journey.css";
 
@@ -217,7 +217,7 @@ export default function WindowTableJourney() {
           </a>
         </div>
       </div>
-      {inspect && <CrepeViewer onClose={() => setInspect(false)} />}
+      {inspect && <DishViewer onClose={() => setInspect(false)} />}
     </section>
   );
 }

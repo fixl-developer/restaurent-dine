@@ -45,6 +45,9 @@ export interface PublicMenuItem {
   allergens: string[];
   tags: string[];
   imageUrl?: string;
+  /** Optional transparent artwork and a self-contained glTF binary for menu inspection. */
+  cutoutUrl?: string;
+  modelUrl?: string;
   prepTimeMinutes: number;
   variants: PublicVariant[];
   modifierGroups: PublicModifierGroup[];

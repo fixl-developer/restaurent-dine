@@ -79,10 +79,26 @@
 }
 @media (prefers-reduced-motion: reduce) { .mb-leaf { display: none; } }
 
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .mb-spread > .mb-photo-page img {
-    transform: perspective(900px) rotateX(var(--photo-y, 0deg)) rotateY(var(--photo-x, 0deg));
-    transition: transform .16s ease-out, box-shadow .16s ease-out;
-  }
-  .mb-spread > .mb-photo-page:hover img { box-shadow: 0 5px 13px #38231f3d; }
+.mb-cutout { align-content: end; justify-items: center; isolation: isolate; }
+.mb-cutout img {
+  object-fit: contain;
+  inset: 6% 9% 17%; width: 82%; height: 77%;
+  filter: drop-shadow(0 3px 2px #5c3a262f);
+  transition: transform .4s ease, filter .4s ease;
+}
+.mb-cutout[data-lifted="true"] img {
+  transform: translateY(-6%) scale(1.04);
+  filter: drop-shadow(0 18px 9px #55351f52);
+}
+.mb-lift-control {
+  position: relative; z-index: 1; min-height: 44px;
+  padding: .5rem 1rem; border: 1px solid #bca590;
+  background: #fff8e9; color: #552435; border-radius: 2rem;
+}
+@media (prefers-reduced-motion: reduce) { .mb-cutout img { transition: none; } }
+
+.guest-food-image > .mb-photo-page { min-height: 0; height: 100%; }
+.guest-food-image .mb-cutout img { object-fit: contain; width: 82%; height: 77%; }
+@media (max-width: 640px) {
+  .guest-food-image .mb-lift-control { padding-inline: .5rem; font-size: .875rem; }
 }

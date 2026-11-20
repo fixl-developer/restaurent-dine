@@ -1,3 +1,4 @@
+import bundledMedia from "@/config/dishMedia.json";
 import type { PublicCategory, PublicMenuItem } from "@/lib/dto/guest";
 
 function key(value: string) {
@@ -28,6 +29,30 @@ function displayIndex(item: PublicMenuItem) {
 
 export const hasCrepeViewer = (item: PublicMenuItem) =>
   displayIndex(item) === 2;
+
+const mediaByItem: Record<string, { cutoutUrl?: string; modelUrl?: string }> = bundledMedia;
+
+function localMedia(item: PublicMenuItem) {
+  return mediaByItem[item.id] ?? mediaByItem[item.slug] ??
+    (isSesameNoodles(item) ? mediaByItem["sichuan-sesame-chili-noodles"] : undefined);
+}
+
+export function dishModelUrl(item: PublicMenuItem) {
+  return item.modelUrl?.trim() || localMedia(item)?.modelUrl;
+}
+
+export const hasDishModel = (item: PublicMenuItem) =>
+  Boolean(dishModelUrl(item)) || hasCrepeViewer(item);
+
+export function isSesameNoodles(item: PublicMenuItem) {
+  return [item.name, item.slug].some((value) =>
+    /^sichuan sesame chill?i noodles$/.test(key(value))
+  );
+}
+
+export function dishCutout(item: PublicMenuItem) {
+  return item.cutoutUrl?.trim() || localMedia(item)?.cutoutUrl;
+}
 
 export function caseSelection(categories: PublicCategory[]) {
   const items = categories.flatMap((category) => category.items);

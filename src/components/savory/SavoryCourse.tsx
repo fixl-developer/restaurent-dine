@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
 import { usePublicMenu } from "@/hooks/useGuest";
+import { isSesameNoodles } from "@/components/counter/menuDisplay";
 import "./savory.css";
 
 export default function SavoryCourse() {
   const { data } = usePublicMenu({ channel: "window" });
   const noodles = data?.categories
     .flatMap((category) => category.items)
-    .find((item) => [item.name, item.slug].some((value) =>
-      /^sichuan[ -]sesame[ -]chill?i[ -]noodles$/i.test(value)
-    ));
+    .find(isSesameNoodles);
 
   return (
     <section className="savory-course" id="savory-course" aria-labelledby="savory-title">
