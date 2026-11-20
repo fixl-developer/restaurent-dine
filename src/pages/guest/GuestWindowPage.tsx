@@ -9,6 +9,7 @@ import {
   startingPrice,
 } from "@/components/counter/menuDisplay";
 import type { GuestOrderDto } from "@/lib/dto/guest";
+import CategoryRail from "@/components/menuBook/CategoryRail";
 import MenuBook from "@/components/menuBook/MenuBook";
 import CrepeViewer from "@/components/windowTable/CrepeViewer";
 import GuestHeader from "@/components/ui/GuestHeader";
@@ -372,15 +373,9 @@ export default function GuestWindowPage() {
       <GuestHeader />
       <section className="guest-menu-heading">
         <div>
-          <span className="ui-eyebrow">MADE FOR YOUR HAPPY MOMENTS</span>
-          <h1>
-            A little something
-            <br />
-            you’ll <em>love.</em>
-          </h1>
-          <p>
-            Find your favorite, make it your own, and pick it up with a smile.
-          </p>
+          <h1>The café menu</h1>
+          <p><ShoppingBag size={16} aria-hidden="true" /> Order ahead and pay at pickup.</p>
+          <p>Dining in? Scan the QR code at your table.</p>
           {verifiedPhone && (
             <p className="mt-2">
               Signed in as {verifiedPhone} ·{" "}
@@ -390,17 +385,7 @@ export default function GuestWindowPage() {
             </p>
           )}
         </div>
-        <aside className="guest-pickup-note">
-          <strong>
-            <ShoppingBag size={17} />
-            Pickup at the café
-          </strong>
-          <p>
-            Order ahead. Pay when you collect.
-            <br />
-            Dining in? Use your table’s QR code.
-          </p>
-        </aside>
+        <img src="/counter/bar.webp" alt="" className="guest-menu-counter" />
       </section>
       <div className="guest-menu-toolbar">
         <div className="guest-toolbar-inner">
@@ -410,7 +395,7 @@ export default function GuestWindowPage() {
               aria-label="Search menu"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search your cravings…"
+              placeholder="Search the menu…"
             />
             {search && (
               <button aria-label="Clear search" onClick={() => setSearch("")}>
@@ -418,29 +403,10 @@ export default function GuestWindowPage() {
               </button>
             )}
           </div>
-          <nav className="guest-categories" aria-label="Menu categories">
-            <button
-              aria-pressed={activeCategory === "all"}
-              onClick={() => {
-                setActiveCategory("all");
-                setSearch("");
-              }}
-            >
-              All favorites
-            </button>
-            {menu?.categories.map((c) => (
-              <button
-                key={c.id}
-                aria-pressed={activeCategory === c.id}
-                onClick={() => {
-                  setActiveCategory(c.id);
-                  setSearch("");
-                }}
-              >
-                {c.name}
-              </button>
-            ))}
-          </nav>
+          <CategoryRail categories={categories} selected={activeCategory} onSelect={(id) => {
+            setActiveCategory(id);
+            setSearch("");
+          }} />
         </div>
       </div>
       <main className="guest-catalog">
@@ -449,13 +415,13 @@ export default function GuestWindowPage() {
             {search
               ? "Your search"
               : activeCategory === "all"
-                ? "The good stuff"
+                ? "All dishes"
                 : menu?.categories.find((c) => c.id === activeCategory)?.name}
           </h2>
           <div className="mb-view-controls">
           <span aria-live="polite">
             {filteredItems.length}{" "}
-            {filteredItems.length === 1 ? "favorite" : "favorites"}
+            {filteredItems.length === 1 ? "dish" : "dishes"}
           </span>
           <div className="mb-view-switch" role="group" aria-label="Menu layout">
             <button type="button" aria-pressed={menuView === "book"} onClick={() => setMenuView("book")}><BookOpen size={16} /> Book</button>
