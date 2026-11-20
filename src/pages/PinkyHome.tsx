@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { usePublicRestaurant } from "@/hooks/useRestaurant";
 import "./pinky.css";
+import SavoryCourse from "@/components/savory/SavoryCourse";
 import CafeCounter from "@/components/counter/CafeCounter";
 import WindowTableJourney from "@/components/windowTable/WindowTableJourney";
 
@@ -59,6 +60,7 @@ export default function PinkyHome() {
       <main id="main">
         <WindowTableJourney />
         <CafeCounter />
+        <SavoryCourse />
         <section className="pinky-section pinky-about">
           <div className="pinky-about-art">
             <img
