@@ -9,13 +9,14 @@ import {
   startingPrice,
 } from "@/components/counter/menuDisplay";
 import type { GuestOrderDto } from "@/lib/dto/guest";
+import MenuBook from "@/components/menuBook/MenuBook";
 import CrepeViewer from "@/components/windowTable/CrepeViewer";
 import GuestHeader from "@/components/ui/GuestHeader";
 import PageState from "@/components/ui/PageState";
 import Dialog from "@/components/ui/Dialog";
 import ResizeHandle from "@/components/ui/ResizeHandle";
 import { useResizableWidth } from "@/hooks/useResizableWidth";
-import { Coffee, Heart, Info } from "lucide-react";
+import { BookOpen, Coffee, Grid2X2, Info } from "lucide-react";
 import GuestQuote from "@/components/GuestQuote";
 import { useGuestQuote } from "@/hooks/useGuestQuote";
 import { useCurrencyFormatter } from "@/hooks/useCurrencyFormatter";
@@ -80,6 +81,7 @@ export default function GuestWindowPage() {
 
   const menuQuery = usePublicMenu({ channel: "window" });
 
+  const [menuView, setMenuView] = useState<"book" | "grid">("book");
   const [search, setSearch] = useState("");
   const draftScope = `pickup:${qrSlug ?? "counter"}`;
   const { draft, field } = useCheckoutDraft(draftScope);
@@ -185,6 +187,12 @@ export default function GuestWindowPage() {
       ];
     });
   }
+
+  const quantities = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const line of cart) counts.set(line.itemId, (counts.get(line.itemId) ?? 0) + line.qty);
+    return counts;
+  }, [cart]);
 
   function adjustQty(key: string, delta: number) {
     setCart(
@@ -444,10 +452,16 @@ export default function GuestWindowPage() {
                 ? "The good stuff"
                 : menu?.categories.find((c) => c.id === activeCategory)?.name}
           </h2>
+          <div className="mb-view-controls">
           <span aria-live="polite">
             {filteredItems.length}{" "}
             {filteredItems.length === 1 ? "favorite" : "favorites"}
           </span>
+          <div className="mb-view-switch" role="group" aria-label="Menu layout">
+            <button type="button" aria-pressed={menuView === "book"} onClick={() => setMenuView("book")}><BookOpen size={16} /> Book</button>
+            <button type="button" aria-pressed={menuView === "grid"} onClick={() => setMenuView("grid")}><Grid2X2 size={16} /> Grid</button>
+          </div>
+          </div>
         </div>
         {filteredItems.length === 0 && (
           <PageState
@@ -479,11 +493,13 @@ export default function GuestWindowPage() {
             }
           />
         )}
+        {menuView === "book" ? (
+          <MenuBook key={JSON.stringify([activeCategory, search])} items={filteredItems} categories={categories}
+            formatPrice={fmtINR} quantities={quantities} onAdd={addItem} onInspect={setInspection} />
+        ) : (
         <div className="guest-menu-grid">
           {filteredItems.map((item) => {
-            const inCart = cart
-              .filter((l) => l.itemId === item.id)
-              .reduce((s, l) => s + l.qty, 0);
+            const inCart = quantities.get(item.id) ?? 0;
             return (
               <article className="guest-menu-card" key={item.id}>
                 <div className="guest-food-image">
@@ -539,6 +555,7 @@ export default function GuestWindowPage() {
             );
           })}
         </div>
+        )}
         <p className="guest-allergy-note">
           <Info size={16} />
           Have an allergy? Talk to our team before ordering so we can help you
