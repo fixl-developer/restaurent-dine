@@ -325,7 +325,7 @@ export default function FloorPlanView({
         if (table) onTableClick?.(table);
       }} objects={tablesWithPos.map(table=>({
         id:table._id, label:"Table " + table.number, detail: [TABLE_STATUS_LABELS[table.status],
-          table.capacity + " seats", table.zone, occupants[table._id]?.guestCount != null ? occupants[table._id].guestCount + " guests" : undefined].filter(Boolean).join(" · "),
+          table.capacity + " seats", table.zone, occupants[table._id]?.serverName, occupants[table._id]?.guestCount != null ? occupants[table._id].guestCount + " guests" : undefined].filter(Boolean).join(" · "),
         x:table._pos.x/70,z:table._pos.y/70,kind:shapeFor(table),capacity:table.capacity,
         status:table.status,highlighted:highlightedIds?.has(table._id),
       }))}/> : <div className="relative w-full bg-gradient-to-br from-stone-50 via-amber-50/30 to-rose-50/30 rounded-2xl border border-stone-200 overflow-hidden">

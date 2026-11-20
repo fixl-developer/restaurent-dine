@@ -1,3 +1,4 @@
+import RunnerPass from "@/components/tableService/RunnerPass";
 import RoomPreview from "@/components/serviceRoom/RoomPreview";
 import Dialog from "@/components/ui/Dialog";
 import PageState from "@/components/ui/PageState";
@@ -298,11 +299,12 @@ function OrderCard({
       <div className="px-3.5 pb-3.5">
         <Can perm="kds:update">
           <button
+            disabled={!!order.qrService && allReady}
             onClick={onClick}
             className={`w-full py-2.5 rounded-[100px] active:scale-[0.98] text-[10px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer ${btnClass}`}
           >
             <Icon className="w-3.5 h-3.5" />
-            {label}
+            {order.qrService && allReady ? "Awaiting runner" : label}
           </button>
         </Can>
       </div>
@@ -722,6 +724,7 @@ export default function KitchenDisplaySystem({
         </div>
       </div>
 
+      <div className="shrink-0 max-h-[30vh] overflow-auto px-4"><RunnerPass/></div>
       {/* Offline Banner */}
       {!isOnline && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 md:px-6 py-2 flex items-center gap-2 text-[11px] text-amber-700 font-mono">

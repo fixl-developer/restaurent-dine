@@ -402,7 +402,8 @@ export default function GuestTrackPage() {
         )}
 
         {/* Quick requests */}
-        {canRequest && !isWindow && (
+        {canRequest && order.qrService && <p className="rounded-xl bg-white p-4">Open your table QR to request water, help or the bill.</p>}
+        {canRequest && !order.qrService && !isWindow && (
           <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
             <h3 className="font-semibold text-gray-900 text-sm mb-3">
               Need something?

@@ -140,6 +140,7 @@ export interface PlaceWindowInput {
 
 // ── Guest order response (toGuestDTO from backend) ─────────────────────────
 export interface GuestOrderDto {
+  qrService?:boolean;
   fulfillment?: "dine_in" | "pickup" | "delivery";
   currency?: string;
   pickupAt?: string;
