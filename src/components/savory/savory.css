@@ -10,7 +10,7 @@
 .pinky-site .savory-copy h2 { margin: 1.2rem 0; font: 500 clamp(3.2rem,6vw,7rem)/.95 Georgia,serif; letter-spacing: -.055em; }
 .savory-copy h2 i { color: #ffc8a4; }
 .savory-tasting { margin: 1.8rem 0 1.1rem; max-width: 25rem; }
-.savory-moments { display: flex; gap: 8px; }
+.savory-moments { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 7px; }
 .savory-moments button {
   flex: 1; min-height: 44px; border-top: 2px solid #a5736d; text-align: left;
   font-size: clamp(.74rem,1.2vw,.9rem); color: #e2b9ac;
@@ -32,8 +32,9 @@
 .savory-art img { position: absolute; object-fit: contain; user-select: none; pointer-events: none; }
 .savory-bowl { width: 83%; left: 7%; bottom: 4%; transform: translateY(calc(var(--lift) * 2%)) rotate(calc(var(--lift) * -2deg)); }
 .savory-lift {
+  position: absolute; aspect-ratio: 880/718;
   width: 67%; right: -5%; top: 0; transform-origin: right top;
-  transform: translate3d(calc(var(--lift) * -3%), calc(33% - var(--lift) * 53%), 18px) rotate(calc(7deg - var(--lift) * 13deg));
+  transform: translate3d(calc(var(--lift) * -3%), var(--stick-y), 0) rotate(var(--tilt));
   filter: drop-shadow(0 7px 5px #663a191c);
 }
 .savory-shadow {
@@ -43,7 +44,7 @@
 .savory-scrub { display: flex; align-items: center; gap: 1rem; margin: .65rem 0 0; color: #fff1dc; font: italic 1.05rem Georgia,serif; }
 .savory-scrub input { min-width: 65px; flex: 1; height: 44px; cursor: ew-resize; accent-color: #f2c394; }
 @media (min-width: 761px) and (min-height: 550px) and (prefers-reduced-motion: no-preference) {
-  .savory-course { min-height: 155svh; }
+  .savory-course { min-height: 245svh; }
   .savory-stage { position: sticky; top: 0; min-height: 100svh; }
   .savory-plate { max-width: min(75svh,49vw); margin-inline: auto; }
 }
@@ -54,3 +55,14 @@
   .savory-tasting { margin: 1.1rem 0 .25rem; }
   .savory-description { min-height: 3.1em; }
 }
+
+.savory-camera { position: absolute; inset: 0; transform: scale(var(--camera)); transform-origin: 68% 43%; }
+.savory-lift img { inset: 0; width: 100%; height: 100%; }
+.savory-grip { clip-path: inset(0 0 54.9% 0); }
+.savory-strands { clip-path: inset(45% 0 0 0); transform-origin: center 45%; transform: scaleY(var(--length)); }
+.savory-transport { display: flex; align-items: center; gap: clamp(.45rem,1vw,.9rem); margin-top: .65rem; }
+.savory-play { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-width: 7rem; min-height: 44px; border: 1px solid #dfb895; border-radius: 24px; font-size: .83rem; }
+.savory-transport .savory-scrub { flex: 1; margin: 0; min-width: 0; }
+.savory-scrub input { width: 100%; min-width: 0; }
+.savory-time { font: .75rem system-ui,sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .savory-camera { transform: none; } }
