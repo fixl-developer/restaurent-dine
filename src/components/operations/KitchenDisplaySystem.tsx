@@ -1,3 +1,5 @@
+import RunnerPass from "@/components/tableService/RunnerPass";
+import RoomPreview from "@/components/serviceRoom/RoomPreview";
 import Dialog from "@/components/ui/Dialog";
 import PageState from "@/components/ui/PageState";
 import { Can } from "@/components/auth/Can";
@@ -297,11 +299,12 @@ function OrderCard({
       <div className="px-3.5 pb-3.5">
         <Can perm="kds:update">
           <button
+            disabled={!!order.qrService && allReady}
             onClick={onClick}
             className={`w-full py-2.5 rounded-[100px] active:scale-[0.98] text-[10px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer ${btnClass}`}
           >
             <Icon className="w-3.5 h-3.5" />
-            {label}
+            {order.qrService && allReady ? "Awaiting runner" : label}
           </button>
         </Can>
       </div>
@@ -385,6 +388,8 @@ export default function KitchenDisplaySystem({
       : [new URLSearchParams()];
   const initialStation = params.get("station") ?? undefined;
   const [station, setStation] = useState<string | undefined>(initialStation);
+  const [lineView,setLineView] = useState(false);
+  const [lane,setLane] = useState("intake");
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [pendingConfirm, setPending] = useState<PendingConfirm | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -473,6 +478,12 @@ export default function KitchenDisplaySystem({
       o.items.every((i) => i.status === "ready" || i.status === "cancelled") &&
       o.items.some((i) => i.status === "ready"),
   );
+
+  const lanes = [
+    { id:"intake", label:"Ticket rail", title:"New Orders", orders:newOrders, icon:Clock, text:"text-[#E8447A]", dot:"bg-[#E8447A]", header:"bg-[#E8447A]/15", border:"border-[#E8447A]/30" },
+    { id:"range", label:"Cook line", title:"Preparing", orders:preparingOrders, icon:ChefHat, text:"text-amber-600", dot:"bg-amber-500", header:"bg-amber-50", border:"border-amber-200" },
+    { id:"pass", label:"Service pass", title:"Ready to Serve", orders:readyOrders, icon:Package, text:"text-teal-700", dot:"bg-teal-500", header:"bg-teal-50", border:"border-teal-200" },
+  ] as const;
 
   const totalItems = displayOrders.reduce((s, o) => s + o.items.length, 0);
 
@@ -713,6 +724,7 @@ export default function KitchenDisplaySystem({
         </div>
       </div>
 
+      <div className="shrink-0 max-h-[30vh] overflow-auto px-4"><RunnerPass/></div>
       {/* Offline Banner */}
       {!isOnline && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 md:px-6 py-2 flex items-center gap-2 text-[11px] text-amber-700 font-mono">
@@ -723,6 +735,12 @@ export default function KitchenDisplaySystem({
 
       {/* Timer Legend */}
       <div className="border-b border-[rgba(26,26,26,0.10)] px-4 md:px-6 py-2 flex flex-wrap items-center gap-3 md:gap-6 bg-[#FFFFFF] shrink-0">
+        <div className="inline-flex rounded-lg border p-0.5" role="group" aria-label="Kitchen view">
+          {[{scene:false,label:"Ticket board"},{scene:true,label:"3D kitchen"}].map(view=>
+            <button type="button" key={view.label} aria-pressed={lineView===view.scene}
+              className="min-h-10 rounded-md px-3 text-xs font-semibold aria-pressed:bg-stone-800 aria-pressed:text-white"
+              onClick={()=>setLineView(view.scene)}>{view.label}</button>)}
+        </div>
         <span className="text-[11px] font-mono text-[#1a1a1a]/65 uppercase tracking-widest">
           Timer:
         </span>
@@ -771,40 +789,19 @@ export default function KitchenDisplaySystem({
           </div>
         </div>
       ) : (
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 overflow-auto md:overflow-hidden min-h-0">
-          <KDSColumn
-            title="New Orders"
-            statusColor="text-[#E8447A]"
-            dotClass="bg-[#E8447A] animate-pulse"
-            headerBg="bg-[#E8447A]/15"
-            borderClass="border-[#E8447A]/30"
-            orders={newOrders}
-            emptyIcon={Clock}
-            onAdvance={requestAdvance}
-            onComplete={requestComplete}
-          />
-          <KDSColumn
-            title="Preparing"
-            statusColor="text-amber-600"
-            dotClass="bg-amber-500"
-            headerBg="bg-amber-50"
-            borderClass="border-amber-200"
-            orders={preparingOrders}
-            emptyIcon={ChefHat}
-            onAdvance={requestAdvance}
-            onComplete={requestComplete}
-          />
-          <KDSColumn
-            title="Ready to Serve"
-            statusColor="text-[#1BC8C8]"
-            dotClass="bg-[#1BC8C8]"
-            headerBg="bg-[#1BC8C8]/10"
-            borderClass="border-[#1BC8C8]/25"
-            orders={readyOrders}
-            emptyIcon={Package}
-            onAdvance={requestAdvance}
-            onComplete={requestComplete}
-          />
+        <div className={lineView
+          ? "flex-1 grid grid-cols-1 md:grid-cols-[minmax(0,1.35fr)_minmax(16rem,1fr)] overflow-auto md:overflow-hidden min-h-0"
+          : "flex-1 grid grid-cols-1 md:grid-cols-3 overflow-auto md:overflow-hidden min-h-0"}>
+          {lineView && <div className="min-w-0 overflow-auto p-3">
+            <RoomPreview kitchen selected={lane} onSelect={setLane} objects={lanes.map((stage,i)=>({
+              id:stage.id,kind:stage.id,x:(i-1)*2.8,z:0,label:stage.label,
+              detail:stage.orders.length + (stage.orders.length === 1 ? " ticket" : " tickets"),
+            }))}/>
+          </div>}
+          {lanes.filter(stage=>!lineView || lane===stage.id).map(stage=><KDSColumn key={stage.id}
+            title={stage.title} statusColor={stage.text} dotClass={stage.dot} headerBg={stage.header}
+            borderClass={stage.border} orders={stage.orders} emptyIcon={stage.icon}
+            onAdvance={requestAdvance} onComplete={requestComplete}/>)}
         </div>
       )}
 

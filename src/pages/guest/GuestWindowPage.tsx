@@ -3,13 +3,23 @@ import { useCheckoutDraft } from "@/hooks/useCheckoutDraft";
 import { submitCheckout } from "@/lib/checkoutDraft";
 import { ApiError } from "@/lib/api";
 import CheckoutRecovery from "@/components/CheckoutRecovery";
+import {
+  dishCutout,
+  drinksCategory,
+  hasDishModel,
+  startingPrice,
+} from "@/components/counter/menuDisplay";
 import type { GuestOrderDto } from "@/lib/dto/guest";
+import CategoryRail from "@/components/menuBook/CategoryRail";
+import DishArtwork from "@/components/menuBook/DishArtwork";
+import MenuBook from "@/components/menuBook/MenuBook";
+import DishViewer from "@/components/windowTable/DishViewer";
 import GuestHeader from "@/components/ui/GuestHeader";
 import PageState from "@/components/ui/PageState";
 import Dialog from "@/components/ui/Dialog";
 import ResizeHandle from "@/components/ui/ResizeHandle";
 import { useResizableWidth } from "@/hooks/useResizableWidth";
-import { Coffee, Heart, Info } from "lucide-react";
+import { BookOpen, Coffee, Grid2X2, Info } from "lucide-react";
 import GuestQuote from "@/components/GuestQuote";
 import { useGuestQuote } from "@/hooks/useGuestQuote";
 import { useCurrencyFormatter } from "@/hooks/useCurrencyFormatter";
@@ -57,10 +67,11 @@ function loadStoredToken(): { token: string; phone: string } | null {
 
 export default function GuestWindowPage() {
   const fmtINR = useCurrencyFormatter();
+  const [inspection, setInspection] = useState<PublicMenuItem | null>(null);
   const [customizingItem, setCustomizingItem] = useState<PublicMenuItem | null>(
     null,
   );
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const qrSlug = params.get("qr") ?? undefined;
 
@@ -73,8 +84,8 @@ export default function GuestWindowPage() {
 
   const menuQuery = usePublicMenu({ channel: "window" });
 
+  const [menuView, setMenuView] = useState<"book" | "grid">("book");
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string | null>("all");
   const draftScope = `pickup:${qrSlug ?? "counter"}`;
   const { draft, field } = useCheckoutDraft(draftScope);
   const { cart, guestName, guestNotes, pickupAt } = draft;
@@ -88,16 +99,49 @@ export default function GuestWindowPage() {
     onPointerDown: onCartResize,
     onKeyDown: onCartResizeKey,
     reset: resetCartWidth,
-  } = useResizableWidth({ storageKey: "pinky.guestCartWidth", defaultWidth: 448 });
+  } = useResizableWidth({
+    storageKey: "pinky.guestCartWidth",
+    defaultWidth: 448,
+  });
   const [showOtpModal, setShowOtpModal] = useState(false);
 
   const menu = menuQuery.data;
 
+  const categories = menu?.categories ?? [];
+  const requestedCategory = params.get("category");
+  const activeCategory =
+    categories.find((c) => c.id === requestedCategory)?.id ??
+    (params.get("collection") === "drinks"
+      ? drinksCategory(categories)?.id
+      : undefined) ??
+    "all";
+
+  function setActiveCategory(id: string) {
+    setParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        next.delete("collection");
+        if (id === "all") next.delete("category");
+        else next.set("category", id);
+        return next;
+      },
+      { replace: true },
+    );
+  }
+
   useEffect(() => {
-    if (menu && !activeCategory && menu.categories.length > 0) {
-      setActiveCategory(menu.categories[0].id);
-    }
-  }, [menu, activeCategory]);
+    const id = params.get("item");
+    if (!id || !menu) return;
+    const item = menu.categories
+      .flatMap((category) => category.items)
+      .find((candidate) => candidate.id === id);
+    if (item && hasDishModel(item)) setInspection(item);
+    else if (item) setCustomizingItem(item);
+    else toast.info("This item is no longer on the menu.");
+    const next = new URLSearchParams(params);
+    next.delete("item");
+    setParams(next, { replace: true });
+  }, [menu, params, setParams]);
 
   const filteredItems = useMemo(() => {
     if (!menu) return [];
@@ -146,6 +190,12 @@ export default function GuestWindowPage() {
       ];
     });
   }
+
+  const quantities = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const line of cart) counts.set(line.itemId, (counts.get(line.itemId) ?? 0) + line.qty);
+    return counts;
+  }, [cart]);
 
   function adjustQty(key: string, delta: number) {
     setCart(
@@ -294,6 +344,16 @@ export default function GuestWindowPage() {
 
   return (
     <div className="guest-menu">
+      {inspection && (
+        <DishViewer
+          dish={inspection}
+          onClose={() => setInspection(null)}
+          onAdd={() => {
+            setInspection(null);
+            addItem(inspection);
+          }}
+        />
+      )}
       {customizingItem && (
         <CustomizeModal
           fmt={fmtINR}
@@ -308,15 +368,9 @@ export default function GuestWindowPage() {
       <GuestHeader />
       <section className="guest-menu-heading">
         <div>
-          <span className="ui-eyebrow">MADE FOR YOUR HAPPY MOMENTS</span>
-          <h1>
-            A little something
-            <br />
-            you’ll <em>love.</em>
-          </h1>
-          <p>
-            Find your favorite, make it your own, and pick it up with a smile.
-          </p>
+          <h1>The café menu</h1>
+          <p><ShoppingBag size={16} aria-hidden="true" /> Order ahead and pay at pickup.</p>
+          <p>Dining in? Scan the QR code at your table.</p>
           {verifiedPhone && (
             <p className="mt-2">
               Signed in as {verifiedPhone} ·{" "}
@@ -326,17 +380,7 @@ export default function GuestWindowPage() {
             </p>
           )}
         </div>
-        <aside className="guest-pickup-note">
-          <strong>
-            <ShoppingBag size={17} />
-            Pickup at the café
-          </strong>
-          <p>
-            Order ahead. Pay when you collect.
-            <br />
-            Dining in? Use your table’s QR code.
-          </p>
-        </aside>
+        <img src="/counter/bar.webp" alt="" className="guest-menu-counter" />
       </section>
       <div className="guest-menu-toolbar">
         <div className="guest-toolbar-inner">
@@ -346,7 +390,7 @@ export default function GuestWindowPage() {
               aria-label="Search menu"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search your cravings…"
+              placeholder="Search the menu…"
             />
             {search && (
               <button aria-label="Clear search" onClick={() => setSearch("")}>
@@ -354,29 +398,10 @@ export default function GuestWindowPage() {
               </button>
             )}
           </div>
-          <nav className="guest-categories" aria-label="Menu categories">
-            <button
-              aria-pressed={activeCategory === "all"}
-              onClick={() => {
-                setActiveCategory("all");
-                setSearch("");
-              }}
-            >
-              All favorites
-            </button>
-            {menu?.categories.map((c) => (
-              <button
-                key={c.id}
-                aria-pressed={activeCategory === c.id}
-                onClick={() => {
-                  setActiveCategory(c.id);
-                  setSearch("");
-                }}
-              >
-                {c.name}
-              </button>
-            ))}
-          </nav>
+          <CategoryRail categories={categories} selected={activeCategory} onSelect={(id) => {
+            setActiveCategory(id);
+            setSearch("");
+          }} />
         </div>
       </div>
       <main className="guest-catalog">
@@ -385,13 +410,19 @@ export default function GuestWindowPage() {
             {search
               ? "Your search"
               : activeCategory === "all"
-                ? "The good stuff"
+                ? "All dishes"
                 : menu?.categories.find((c) => c.id === activeCategory)?.name}
           </h2>
+          <div className="mb-view-controls">
           <span aria-live="polite">
             {filteredItems.length}{" "}
-            {filteredItems.length === 1 ? "favorite" : "favorites"}
+            {filteredItems.length === 1 ? "dish" : "dishes"}
           </span>
+          <div className="mb-view-switch" role="group" aria-label="Menu layout">
+            <button type="button" aria-pressed={menuView === "book"} onClick={() => setMenuView("book")}><BookOpen size={16} /> Book</button>
+            <button type="button" aria-pressed={menuView === "grid"} onClick={() => setMenuView("grid")}><Grid2X2 size={16} /> Grid</button>
+          </div>
+          </div>
         </div>
         {filteredItems.length === 0 && (
           <PageState
@@ -423,15 +454,19 @@ export default function GuestWindowPage() {
             }
           />
         )}
+        {menuView === "book" ? (
+          <MenuBook collection={JSON.stringify([activeCategory, search])} items={filteredItems} categories={categories}
+            formatPrice={fmtINR} quantities={quantities} onAdd={addItem} onInspect={setInspection} />
+        ) : (
         <div className="guest-menu-grid">
           {filteredItems.map((item) => {
-            const inCart = cart
-              .filter((l) => l.itemId === item.id)
-              .reduce((s, l) => s + l.qty, 0);
+            const inCart = quantities.get(item.id) ?? 0;
             return (
               <article className="guest-menu-card" key={item.id}>
                 <div className="guest-food-image">
-                  {item.imageUrl ? (
+                  {dishCutout(item) ? (
+                    <DishArtwork item={item} interactive />
+                  ) : item.imageUrl ? (
                     <img src={item.imageUrl} alt={item.name} loading="lazy" />
                   ) : (
                     <div className="guest-food-placeholder" aria-hidden="true">
@@ -448,6 +483,14 @@ export default function GuestWindowPage() {
                     }
                   </span>
                   <h3>{item.name}</h3>
+                  {hasDishModel(item) && (
+                    <button
+                      className="dish-preview-link"
+                      onClick={() => setInspection(item)}
+                    >
+                      View in 3D
+                    </button>
+                  )}
                   {item.description && <p>{item.description}</p>}
                   <div className="guest-food-tags">
                     {["veg", "vegan"].includes(item.foodType) && (
@@ -463,17 +506,7 @@ export default function GuestWindowPage() {
                   <div className="guest-food-footer">
                     <strong>
                       {item.variants.length > 0 && <small>From </small>}
-                      {fmtINR(
-                        item.variants.length
-                          ? Math.min(
-                              ...item.variants.map(
-                                (v) =>
-                                  v.absolutePrice ??
-                                  item.basePrice + v.priceDelta,
-                              ),
-                            )
-                          : item.basePrice,
-                      )}
+                      {fmtINR(startingPrice(item))}
                     </strong>
                     <button onClick={() => addItem(item)}>
                       <Plus size={15} />
@@ -485,6 +518,7 @@ export default function GuestWindowPage() {
             );
           })}
         </div>
+        )}
         <p className="guest-allergy-note">
           <Info size={16} />
           Have an allergy? Talk to our team before ordering so we can help you

@@ -1,3 +1,5 @@
+import RoomPreview from "@/components/serviceRoom/RoomPreview";
+import { TABLE_STATUS_LABELS } from "@/lib/dto/tables";
 import { formatCurrency } from "@/lib/currencies";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { TableDto, TableShape, TableStatus } from "@/lib/dto/tables";
@@ -201,6 +203,9 @@ export default function FloorPlanView({
   selectedId,
   highlightedIds,
 }: FloorPlanViewProps) {
+  const [roomView, setRoomView] = useState(true);
+  const showRoom = roomView && !editable;
+  const dropped = useRef<{x:number; y:number} | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -217,12 +222,25 @@ export default function FloorPlanView({
       if (!zoneMap.has(z)) zoneMap.set(z, []);
       zoneMap.get(z)!.push(t);
     }
+    const occupied = tables.flatMap(t => {
+      const pos = pendingPositions[t._id] ?? t.position;
+      return pos ? [pos] : [];
+    });
     const resolved = tables.map((t) => {
-      const pending = pendingPositions[t._id];
-      if (pending) return { ...t, _pos: pending };
-      if (t.position) return { ...t, _pos: t.position };
+      const saved = pendingPositions[t._id] ?? t.position;
+      if (saved) return { ...t, _pos: saved };
       const zoneTables = zoneMap.get(t.zone ?? "Main Floor") ?? [];
-      return { ...t, _pos: autoLayout(t, zoneTables) };
+      const preferred = autoLayout(t, zoneTables);
+      let pos = preferred;
+      // Custom zones have no reserved rectangle. Keep their unsaved tables distinct.
+      if (occupied.some(p => Math.abs(p.x-pos.x)<130 && Math.abs(p.y-pos.y)<115)) {
+        for (let i=0; i<40; i++) {
+          const slot = {x:100+(i%8)*168,y:105+Math.floor(i/8)*155};
+          if (!occupied.some(p => Math.abs(p.x-slot.x)<130 && Math.abs(p.y-slot.y)<115)) { pos=slot; break; }
+        }
+      }
+      occupied.push(pos);
+      return { ...t, _pos: pos };
     });
     return { tablesWithPos: resolved, zones: Array.from(zoneMap.keys()) };
   }, [tables, pendingPositions]);
@@ -234,10 +252,9 @@ export default function FloorPlanView({
   ): { x: number; y: number } {
     const svg = svgRef.current;
     if (!svg) return { x: 0, y: 0 };
-    const rect = svg.getBoundingClientRect();
-    const sx = ((clientX - rect.left) / rect.width) * CANVAS_WIDTH;
-    const sy = ((clientY - rect.top) / rect.height) * CANVAS_HEIGHT;
-    return { x: sx, y: sy };
+    const matrix = svg.getScreenCTM();
+    if (!matrix) return { x: 0, y: 0 };
+    return new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
   }
 
   function onPointerDown(
@@ -256,6 +273,7 @@ export default function FloorPlanView({
     e.stopPropagation();
     (e.currentTarget as Element).setPointerCapture(e.pointerId);
     const pt = clientToSvg(e.clientX, e.clientY);
+    dropped.current = null;
     setDragId(table._id);
     setDragOffset({ x: pt.x - table._pos.x, y: pt.y - table._pos.y });
   }
@@ -272,11 +290,17 @@ export default function FloorPlanView({
       // Snap to 10px grid for cleanliness
       const sx = Math.round(nx / 10) * 10;
       const sy = Math.round(ny / 10) * 10;
+      dropped.current = { x: sx, y: sy };
       setPendingPositions((prev) => ({ ...prev, [dragId]: { x: sx, y: sy } }));
     };
     const up = () => {
-      const finalPos = pendingPositions[dragId];
+      const finalPos = dropped.current;
       if (finalPos) onPositionChange?.(dragId, finalPos);
+      setPendingPositions(previous => {
+        const next = { ...previous };
+        delete next[dragId];
+        return next;
+      });
       setDragId(null);
     };
     window.addEventListener("pointermove", move);
@@ -289,7 +313,22 @@ export default function FloorPlanView({
   }, [dragId, dragOffset]);
 
   return (
-    <div className="relative w-full bg-gradient-to-br from-stone-50 via-amber-50/30 to-rose-50/30 rounded-2xl border border-stone-200 overflow-hidden">
+    <div>
+      {!editable && <div className="mb-3 inline-flex rounded-xl border bg-white p-1" role="group" aria-label="Floor perspective">
+        {[{room:true,label:"3D dining room"},{room:false,label:"Overhead plan"}].map(option =>
+          <button type="button" key={option.label} aria-pressed={roomView === option.room}
+            className="min-h-10 rounded-lg px-3 text-sm aria-pressed:bg-stone-800 aria-pressed:text-white"
+            onClick={()=>setRoomView(option.room)}>{option.label}</button>)}
+      </div>}
+      {showRoom ? <RoomPreview selected={selectedId} onSelect={id=>{
+        const table=tables.find(t=>t._id===id);
+        if (table) onTableClick?.(table);
+      }} objects={tablesWithPos.map(table=>({
+        id:table._id, label:"Table " + table.number, detail: [TABLE_STATUS_LABELS[table.status],
+          table.capacity + " seats", table.zone, occupants[table._id]?.serverName, occupants[table._id]?.guestCount != null ? occupants[table._id].guestCount + " guests" : undefined].filter(Boolean).join(" · "),
+        x:table._pos.x/70,z:table._pos.y/70,kind:shapeFor(table),capacity:table.capacity,
+        status:table.status,highlighted:highlightedIds?.has(table._id),
+      }))}/> : <div className="relative w-full bg-gradient-to-br from-stone-50 via-amber-50/30 to-rose-50/30 rounded-2xl border border-stone-200 overflow-hidden">
       <svg
         ref={svgRef}
         viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
@@ -387,6 +426,7 @@ export default function FloorPlanView({
 
       {/* Status legend */}
       <Legend />
+    </div>}
     </div>
   );
 }

@@ -53,6 +53,15 @@ export interface TableSessionDto {
   openedAt: string;
   closedAt?: string;
   guestCount: number;
+  needsCover?: boolean;
+  offerTo?:string;
+  offerName?:string;
+  offerExpiresAt?:string;
+  assignmentVersion?:number;
+  assignedAt?:string;
+  qrService?: boolean;
+  waiterName?: string;
+  greetedAt?: string;
   waiterId?: string;
   customerId?: string;
   orderIds: string[];

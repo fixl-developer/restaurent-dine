@@ -127,6 +127,7 @@ export async function submitCheckout<T>(
     principal: string;
     noAuth?: boolean;
     guestToken?: string;
+    visitToken?: string;
   },
 ): Promise<T> {
   const { draft, pending } = await locked(scope, () => {
@@ -158,7 +159,7 @@ export async function submitCheckout<T>(
     const order = await api.post<T>(pending.path, pending.body, {
       noAuth: request.noAuth,
       guestToken: request.guestToken,
-      headers: { "Idempotency-Key": draft.key },
+      headers: { "Idempotency-Key": draft.key, ...(request.visitToken ? {"X-Visit-Token":request.visitToken} : {}) },
     });
     await locked(scope, () => {
       if (readCheckout(scope).key === draft.key) {
@@ -190,4 +191,10 @@ export async function submitCheckout<T>(
       );
     throw error;
   }
+}
+
+export function clearVisitDraft(visitId: string) {
+  const scope = "visit:"+visitId;
+  cache.delete(scope);
+  try {localStorage.removeItem(prefix+scope);localStorage.removeItem("smartdine:lastOrder:"+scope);}catch{}
 }

@@ -1,0 +1,55 @@
+.savory-course {background:#efd5ac;color:#3b231d;}
+.savory-stage {
+  position:relative; isolation:isolate; overflow:clip; min-height:88svh; display:grid;
+  grid-template-columns:minmax(0,.84fr) minmax(0,1.16fr); align-items:center;
+  padding:clamp(2rem,5vw,6rem) 6% 6.5rem;
+  background:radial-gradient(ellipse at 71% 34%,#fff1ce 0,transparent 52%),
+    linear-gradient(114deg,#f8e9ca 0%,#eacda3 63%,#c99970 100%);
+}
+.savory-stage::before {content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(112deg,transparent 33%,#fffae53b 34% 41%,transparent 42% 44%,#fffbe431 45% 51%,transparent 52%),
+    linear-gradient(0deg,#ab75594d,transparent 25%);}
+.savory-copy {position:relative;z-index:2;align-self:center;max-width:34rem;pointer-events:none;}
+.savory-copy a {pointer-events:auto}
+.savory-kicker {font:650 .85rem/1.5 Inter,sans-serif;text-transform:uppercase;letter-spacing:.16em;color:#774230;}
+.pinky-site .savory-copy h2 {margin:.7rem 0 1.35rem;font:500 clamp(3.6rem,6.4vw,7.6rem)/.94 Georgia,serif;letter-spacing:-.07em;}
+.savory-copy h2 i {color:#8c3d2a;}
+.savory-description {max-width:32ch;line-height:1.65;font-size:clamp(1rem,1.23vw,1.15rem);min-height:4.9em;}
+.savory-link {display:inline-flex;align-items:center;min-height:44px;border-bottom:1px solid currentColor;font-weight:650;color:#652f23;}
+.savory-art {position:absolute;inset:2% -1% 11% 31%;overflow:visible;}
+.savory-camera {position:absolute;width:min(100%,90svh);height:auto;aspect-ratio:1.22;right:2%;bottom:1%;
+  transform:scale(var(--camera));transform-origin:65% 64%;pointer-events:none;}
+.savory-art img {position:absolute;display:block;object-fit:contain;user-select:none;}
+.savory-bowl {width:90%;left:6%;bottom:1%;transform:translateY(calc(var(--lift) * 1%)) rotate(calc(var(--lift) * -1deg));}
+.savory-shadow {position:absolute;width:69%;height:9%;left:15%;bottom:1%;border-radius:50%;background:#78492f;opacity:.38;filter:blur(15px);}
+.savory-lift {position:absolute;aspect-ratio:880/718;width:68%;right:-4%;top:2%;transform-origin:right top;
+  transform:translate3d(calc(var(--lift) * -3%),var(--stick-y),0) rotate(var(--tilt));}
+.savory-lift img {inset:0;width:100%;height:100%;}
+.savory-grip {clip-path:inset(0 0 54.9% 0);}
+.savory-strands {clip-path:inset(45% 0 0 0);transform-origin:center 45%;transform:scaleY(var(--length));}
+.savory-handle {position:absolute;right:9%;top:calc(35% - var(--lift) * 20%);touch-action:none;user-select:none;cursor:ns-resize;
+  display:flex;align-items:center;gap:.35rem;padding:.6rem .85rem;min-height:44px;border:1px solid #ffffff9c;border-radius:2rem;
+  background:#482d24;color:#fff7e8;font-weight:600;font-size:.875rem;box-shadow:0 2px 12px #37241525;}
+.savory-controls {position:absolute;bottom:2rem;left:6%;right:6%;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.savory-moments {display:flex;flex-wrap:wrap;gap:.25rem .5rem;}
+.savory-moments button,.savory-play {min-height:44px;border-radius:2rem;padding:.55rem .85rem;font:.9rem/1.3 Inter,sans-serif;cursor:pointer;}
+.savory-moments button {color:#47271e;background:#fcf3e78c;}
+.savory-moments button[aria-pressed=true] {background:#492a21;color:white;}
+.savory-play {display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border:1px solid #815b49;background:#fbefdf;color:#46291e;white-space:nowrap;}
+.savory-course :focus-visible {outline:3px solid #7d3135;outline-offset:3px;}
+@media(min-width:801px) and (min-height:681px) and (prefers-reduced-motion:no-preference){
+  .savory-course {min-height:215svh;}
+  .savory-stage {position:sticky;top:0;min-height:100svh;}
+}
+@media(max-width:800px){
+  .savory-stage {min-height:100svh;display:flex;flex-direction:column;align-items:stretch;padding:2.5rem 0 1.25rem;gap:.35rem;}
+  .savory-copy {align-self:stretch;max-width:none;padding:0 6%;}
+  .pinky-site .savory-copy h2 {font-size:clamp(2.85rem,8.4vw,4.8rem);margin:.5rem 0;}
+  .savory-copy h2 br {display:none;} .savory-copy h2 i::before {content:' ';}
+  .savory-description {min-height:3em;max-width:42ch;}
+  .savory-art {position:relative;inset:auto;flex:1 0 auto;width:100%;min-height:0;aspect-ratio:1.35;}
+  .savory-camera {width:min(94%,37rem);right:3%;bottom:0;}
+  .savory-controls {position:relative;inset:auto;flex-wrap:wrap;padding:0 6%;}
+  .savory-moments {gap:.25rem;} .savory-moments button {padding:.45rem .7rem;}
+}
+@media(prefers-reduced-motion:reduce) {.savory-camera {transform:none;}}

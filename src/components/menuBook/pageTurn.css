@@ -1,0 +1,23 @@
+.book-leaf {
+  position: absolute; inset: 0 0 0 50%; z-index: 3; pointer-events: none;
+  transform-style: preserve-3d; transform-origin: left center;
+  animation: book-turn 760ms cubic-bezier(.42,.06,.26,.96) both;
+}
+.book-backward { animation-direction: reverse; }
+.book-face {
+  position: absolute; inset: 0; background: #f6ecd8; backface-visibility: hidden;
+  overflow: hidden; border-radius: 1px 5px 5px 1px;
+}
+.book-face > div { height: 100%; }
+.book-verso { transform: rotateY(180deg); border-radius: 5px 1px 1px 5px; }
+.book-face::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, #492e1c66, transparent 68%, #fff7df66);
+  animation: book-shade 760ms ease-in-out both;
+}
+@keyframes book-turn {
+  from { transform: translateZ(2px) rotateY(0deg); }
+  to { transform: translateZ(2px) rotateY(-180deg); }
+}
+@keyframes book-shade { 0%,100% { opacity: 0; } 48% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .book-leaf { display: none; } }
