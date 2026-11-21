@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, ChefHat, GlassWater, Pause, Play, RotateCcw, ScanLine } from "lucide-react";
+import { Utensils, GlassWater, Pause, Play, ScanLine } from "lucide-react";
+import GuestTablePreview from "./GuestTablePreview";
 import "./serviceFilm.css";
 
 const assets = "/table-service/";
@@ -8,38 +9,15 @@ const duration = 12;
 const sceneLength = 4;
 const lastFrame = duration - 1 / 24;
 const scenes = [
-  {
-    label: "Check in", title: "A welcome at Table 12.", icon: ScanLine, still: "arrive",
-    alt: "A diner holds a phone beside the Table 12 card in the café.",
-    description: "Scan the table card. Once the host seats your party, your waiter shares a code so everyone can join the same visit.",
-    steps: [
-      { role: "Guest", title: "Party of four", detail: "At Table 12", action: "Request seating" },
-      { role: "Host", title: "Arrival received", detail: "4 guests awaiting confirmation", action: "Confirm seating" },
-      { role: "Floor", title: "Seated with Mira", detail: "4 guests · waiter assigned", action: "" },
-    ],
-  },
-  {
-    label: "Call your waiter", title: "Water before the order.", icon: GlassWater, still: "water",
-    alt: "The waiter pours water into a glass at the table.",
-    description: "Once you’ve joined, you can ask for water, help or the bill. Everyone at your table can follow the request.",
-    steps: [
-      { role: "Guest", title: "Water for the table", detail: "Table 12 · waiter Mira", action: "Request water" },
-      { role: "Waiter", title: "Water requested", detail: "One open request for this table", action: "Acknowledge" },
-      { role: "Waiter", title: "On the way", detail: "Mira has acknowledged the request", action: "Mark delivered" },
-      { role: "Guest", title: "Water delivered", detail: "Request completed", action: "" },
-    ],
-  },
-  {
-    label: "Serve the dish", title: "From the pass to you.", icon: ChefHat, still: "kitchen",
-    alt: "A chef hands a bowl of sesame noodles across the kitchen pass.",
-    description: "When a dish is ready, a runner picks it up for your table. The kitchen can keep cooking the rest of your order.",
-    steps: [
-      { role: "Kitchen", title: "Sesame noodles", detail: "1 bowl · Table 12", action: "Mark ready" },
-      { role: "Runner", title: "Ready at the pass", detail: "1 bowl to collect for Table 12", action: "Pick up dish" },
-      { role: "Runner", title: "On the way to you", detail: "Picked up for Table 12", action: "Confirm served" },
-      { role: "Floor", title: "Dish served", detail: "Table 12 received its noodles", action: "" },
-    ],
-  },
+  { label: "My table", title: "Take your seat.", icon: ScanLine, still: "arrive",
+    alt: "A diner holds a phone beside the Table 12 card.",
+    description: "At the café, scan the QR on your table. Your waiter will share a code once your party is seated." },
+  { label: "Table requests", title: "A little water?", icon: GlassWater, still: "water",
+    alt: "A glass of water is poured at the table.",
+    description: "Ask for water, call your waiter or request the bill from your seat. You can see when your waiter picks up your request." },
+  { label: "My order", title: "Your bowl is on its way.", icon: Utensils, still: "kitchen",
+    alt: "Sesame noodles leave the café kitchen for your table.",
+    description: "Follow a bowl of sesame chili noodles from the kitchen to your table." },
 ] as const;
 
 type Mode = "scroll" | "manual" | "playing";
@@ -53,7 +31,6 @@ export default function ServiceFilm() {
   const chapter = useRef(0);
   const mode = useRef<Mode>("scroll");
   const [index, setIndex] = useState(0);
-  const [steps, setSteps] = useState([0, 0, 0]);
   const [preferences, setPreferences] = useState({ reduced: true, compact: true, save: true });
   const [near, setNear] = useState(false);
   const [requested, setRequested] = useState(false);
@@ -62,7 +39,6 @@ export default function ServiceFilm() {
   const [buffering, setBuffering] = useState(false);
   const [frameReady, setFrameReady] = useState(false);
   const scene = scenes[index];
-  const step = scene.steps[steps[index]];
   const pinned = !preferences.compact && !preferences.reduced && !preferences.save;
   const loadFilm = !mediaFailed && (requested || (near && !preferences.save && !preferences.reduced));
 
@@ -73,7 +49,6 @@ export default function ServiceFilm() {
       chapter.current = next;
       setIndex(next);
     }
-    stage.current?.style.setProperty("--film-progress", String(clock.current / lastFrame));
   }, []);
 
   const seek = useCallback((time: number) => {
@@ -194,16 +169,11 @@ export default function ServiceFilm() {
     return () => { cancelled = true; el.removeEventListener("loadedmetadata", start); };
   }, [playing, loadFilm, stop]);
 
-  function advance() {
-    stop();
-    setSteps(current => current.map((value, i) => i === index ? (value + 1) % scenes[i].steps.length : value));
-  }
-
   return (
     <section id="table-service" className="service-film" aria-labelledby="service-film-title">
       <header className="sf-intro">
         <div><p className="sf-kicker">Smart table service</p><h2 id="service-film-title">A seat at <em>Table 12.</em></h2></div>
-        <p>Follow one table from the first scan to the first bite. Try each side of the service in this interactive demo.</p>
+        <p>Try a visit as a guest. Check in with your party, ask for water and follow your order in this table-side demo.</p>
       </header>
       <div className="sf-track" data-pinned={pinned} ref={track}>
         <div className="sf-stage" ref={stage}>
@@ -227,21 +197,11 @@ export default function ServiceFilm() {
                     {playing ? <Pause size={16}/> : <Play size={16}/>}
                     {playing ? buffering ? "Loading film…" : "Pause" : "Play film"}
                   </button>}
-                <span className="sf-meter" aria-hidden="true"><i/></span>
-                <span>12 sec</span>
               </div>
             </div>
             <div className="sf-panel">
               <h3>{scene.title}</h3><p className="sf-copy">{scene.description}</p>
-              <div className="sf-ticket">
-                <div className="sf-ticket-head"><span>{step.role} view</span><span>Table 12</span></div>
-                <div role="status" aria-live="polite" aria-atomic="true">
-                  <strong>{step.title}</strong><p>{step.detail}</p>
-                </div>
-                <button type="button" onClick={advance} className={step.action ? "sf-action" : "sf-reset"}>
-                  {step.action ? step.action : <><Check size={15}/> Complete <RotateCcw size={14}/> Replay step</>}
-                </button>
-              </div>
+              <GuestTablePreview chapter={index} onSelect={select} onInteract={stop} />
             </div>
           </div>
           <div className="sf-chapters" role="group" aria-label="Table service chapters">

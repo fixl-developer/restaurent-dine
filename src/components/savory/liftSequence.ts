@@ -1,4 +1,4 @@
-// Times are seconds in both playback and the manual scrubber.
+// Cue points for the tasting views and the animated lift.
 export const duration = 24;
 
 export const chapters = [

@@ -1,12 +1,29 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Pause, Play, RotateCcw } from "lucide-react";
+import { MoveVertical, Pause, Play, RotateCcw } from "lucide-react";
 import { usePublicMenu } from "@/hooks/useGuest";
 import { isSesameNoodles } from "@/components/counter/menuDisplay";
 import { chapters, duration, poseAt } from "./liftSequence";
 import "./savory.css";
 
-const clock = (seconds: number) => "0:" + String(Math.floor(seconds)).padStart(2, "0");
+function liftTime(height: number) {
+  const targetY = 39 - 46 * Math.max(0, Math.min(1, height));
+  // Match the drag distance to the rendered chopstick position on the rising part of the film.
+  let start = 6,
+    end = 15;
+  for (let i = 0; i < 12; i++) {
+    const middle = (start + end) / 2;
+    if (poseAt(middle).y > targetY) start = middle;
+    else end = middle;
+  }
+  return (start + end) / 2;
+}
 
 export default function SavoryCourse() {
   const section = useRef<HTMLElement>(null);
@@ -14,9 +31,22 @@ export default function SavoryCourse() {
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const playFrom = useRef(0);
+  const drag = useRef<{
+    id: number;
+    y: number;
+    from: number;
+    distance: number;
+    moved: boolean;
+  } | null>(null);
+  const [dragging, setDragging] = useState(false);
   const { data } = usePublicMenu({ channel: "window" });
-  const noodles = data?.categories.flatMap((category) => category.items).find(isSesameNoodles);
-  const active = chapters.reduce((index, chapter, i) => time >= chapter.at ? i : index, 0);
+  const noodles = data?.categories
+    .flatMap((category) => category.items)
+    .find(isSesameNoodles);
+  const active = chapters.reduce(
+    (index, chapter, i) => (time >= chapter.at ? i : index),
+    0,
+  );
   const moment = chapters[active];
   const pose = poseAt(time);
 
@@ -44,7 +74,10 @@ export default function SavoryCourse() {
       frame = 0;
       if (!node || manual.current || motion.matches || !visible) return;
       const rect = node.getBoundingClientRect();
-      const travel = Math.max(rect.height - window.innerHeight, window.innerHeight * .6);
+      const travel = Math.max(
+        rect.height - window.innerHeight,
+        window.innerHeight * 0.6,
+      );
       setTime(Math.max(0, Math.min(1, -rect.top / travel)) * duration);
     }
     function schedule() {
@@ -52,11 +85,19 @@ export default function SavoryCourse() {
     }
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      if (!visible) setPlaying(false);
+      if (!visible) {
+        setPlaying(false);
+        manual.current = false;
+      }
       schedule();
     });
-    const pauseWhenHidden = () => { if (document.hidden) setPlaying(false); };
-    const motionChanged = () => { if (motion.matches) setPlaying(false); schedule(); };
+    const pauseWhenHidden = () => {
+      if (document.hidden) setPlaying(false);
+    };
+    const motionChanged = () => {
+      if (motion.matches) setPlaying(false);
+      schedule();
+    };
     document.addEventListener("visibilitychange", pauseWhenHidden);
     observer.observe(node);
     window.addEventListener("scroll", schedule, { passive: true });
@@ -78,8 +119,44 @@ export default function SavoryCourse() {
     setTime(value);
   }
 
+  function startLift(event: PointerEvent<HTMLButtonElement>) {
+    if (!event.isPrimary || event.button !== 0) return;
+    const height =
+      event.currentTarget.parentElement!.getBoundingClientRect().height;
+    drag.current = {
+      id: event.pointerId,
+      y: event.clientY,
+      from: (39 - pose.y) / 46,
+      distance: Math.max(90, height * 0.47),
+      moved: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    manual.current = true;
+    setPlaying(false);
+    setDragging(true);
+  }
+
+  function moveLift(event: PointerEvent<HTMLButtonElement>) {
+    const gesture = drag.current;
+    if (!gesture || gesture.id !== event.pointerId) return;
+    const dy = gesture.y - event.clientY;
+    if (Math.abs(dy) > 3) gesture.moved = true;
+    if (gesture.moved) inspect(liftTime(gesture.from + dy / gesture.distance));
+  }
+
+  function endLift(event: PointerEvent<HTMLButtonElement>) {
+    if (drag.current?.id !== event.pointerId) return;
+    if (event.type === "pointerup" && !drag.current.moved)
+      inspect(pose.y > 10 ? 15 : 6);
+    drag.current = null;
+    setDragging(false);
+  }
+
   function togglePlayback() {
-    if (playing) { setPlaying(false); return; }
+    if (playing) {
+      setPlaying(false);
+      return;
+    }
     const start = manual.current && time < duration ? time : 0;
     manual.current = true;
     playFrom.current = start;
@@ -88,49 +165,148 @@ export default function SavoryCourse() {
   }
 
   return (
-    <section ref={section} className="savory-course" id="savory-course" aria-labelledby="savory-title">
-      <div className="savory-stage">
+    <section
+      ref={section}
+      className="savory-course"
+      id="savory-course"
+      aria-labelledby="savory-title"
+    >
+      <div className="savory-stage" data-dragging={dragging}>
         <div className="savory-copy">
           <p className="savory-kicker">From the wok</p>
-          <h2 id="savory-title">Sesame<br /><i>chili noodles.</i></h2>
-          <div className="savory-tasting">
-            <div className="savory-moments" role="group" aria-label="Noodle tasting views">
-              {chapters.map((entry, index) => <button type="button" key={entry.title}
-                aria-pressed={active === index} onClick={() => inspect(entry.preview)}>{entry.title}</button>)}
-            </div>
-            <p className="savory-description">{moment.detail}</p>
-          </div>
-          <Link className="savory-link" to={noodles
-            ? "/menu?" + new URLSearchParams({ item: noodles.id, category: noodles.categoryId })
-            : "/menu"}>{noodles ? "View this dish" : "Explore the menu"} <ArrowUpRight size={17} /></Link>
+          <h2 id="savory-title">
+            Sesame
+            <br />
+            <i>chili noodles.</i>
+          </h2>
+          <p className="savory-description">{moment.detail}</p>
+          <Link
+            className="savory-link"
+            to={
+              noodles
+                ? "/menu?" +
+                  new URLSearchParams({
+                    item: noodles.id,
+                    category: noodles.categoryId,
+                  })
+                : "/menu"
+            }
+          >
+            {noodles ? "View this dish" : "Explore the menu"}
+          </Link>
         </div>
-        <div className="savory-plate" style={{
-          "--lift": 1 - (pose.y + 7) / 46, "--camera": pose.zoom,
-          "--stick-y": pose.y + "%", "--tilt": pose.tilt + "deg", "--length": pose.length,
-        } as CSSProperties}>
-          <div className="savory-art" role="img" aria-label={'Sesame chili noodles, ' + moment.title.toLowerCase()}>
-            <div className="savory-camera">
-            <div className="savory-light" /><div className="savory-shadow" />
-            <img className="savory-bowl" src="/savory/bowl.webp" alt="" loading="lazy" width="900" height="559" />
+        <div
+          className="savory-art"
+          style={
+            {
+              "--lift": (39 - pose.y) / 46,
+              "--camera": pose.zoom,
+              "--stick-y": pose.y + "%",
+              "--tilt": pose.tilt + "deg",
+              "--length": pose.length,
+            } as CSSProperties
+          }
+        >
+          <div
+            className="savory-camera"
+            role="img"
+            aria-label={"Sesame chili noodles, " + moment.title.toLowerCase()}
+          >
+            <div className="savory-shadow" />
+            <img
+              className="savory-bowl"
+              src="/savory/bowl.webp"
+              alt=""
+              loading="lazy"
+              width="900"
+              height="559"
+            />
             <div className="savory-lift">
-              <img className="savory-grip" src="/savory/lift.webp" alt="" loading="lazy" width="880" height="718" />
-              <img className="savory-strands" src="/savory/lift.webp" alt="" loading="lazy" width="880" height="718" />
-            </div>
+              <img
+                className="savory-grip"
+                src="/savory/lift.webp"
+                alt=""
+                loading="lazy"
+                width="880"
+                height="718"
+              />
+              <img
+                className="savory-strands"
+                src="/savory/lift.webp"
+                alt=""
+                loading="lazy"
+                width="880"
+                height="718"
+              />
             </div>
           </div>
-          <div className="savory-transport">
-            <button type="button" className="savory-play" onClick={togglePlayback}>
-              {playing ? <Pause size={16} /> : time >= duration ? <RotateCcw size={16} /> : <Play size={16} />}
-              {playing ? "Pause" : time >= duration ? "Replay lift" : manual.current && time > 0 ? "Resume lift" : "Play full lift"}
-            </button>
-            <label className="savory-scrub">
-              <span className="sr-only">Lift the chopsticks</span>
-              <input type="range" min="0" max={duration} step=".1" value={time}
-                aria-valuetext={Math.floor(time) + " seconds, " + moment.title}
-                onChange={(event) => inspect(Number(event.target.value))} />
-            </label>
-            <span className="savory-time" aria-hidden="true">{clock(time)} / {clock(duration)}</span>
+          <button
+            className="savory-handle"
+            type="button"
+            aria-label="Lift or lower the chopsticks"
+            aria-describedby="savory-gesture savory-keys"
+            onPointerDown={startLift}
+            onPointerMove={moveLift}
+            onPointerUp={endLift}
+            onPointerCancel={endLift}
+            onLostPointerCapture={endLift}
+            onClick={(e) => {
+              if (e.detail === 0) inspect(pose.y > 10 ? 15 : 6);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                e.preventDefault();
+                inspect(
+                  liftTime(
+                    (39 - pose.y) / 46 + (e.key === "ArrowUp" ? 0.16 : -0.16),
+                  ),
+                );
+              }
+            }}
+          >
+            <MoveVertical size={19} aria-hidden="true" />
+            <span id="savory-gesture">Drag to lift</span>
+          </button>
+          <span className="sr-only" id="savory-keys">
+            Use the up and down arrow keys to adjust the height, or press Enter
+            to raise or lower the chopsticks.
+          </span>
+        </div>
+        <div className="savory-controls">
+          <div
+            className="savory-moments"
+            role="group"
+            aria-label="Noodle tasting views"
+          >
+            {chapters.map((entry, index) => (
+              <button
+                type="button"
+                key={entry.title}
+                aria-pressed={active === index}
+                onClick={() => inspect(entry.preview)}
+              >
+                {entry.title}
+              </button>
+            ))}
           </div>
+          <button
+            type="button"
+            className="savory-play"
+            onClick={togglePlayback}
+          >
+            {playing ? (
+              <Pause size={16} />
+            ) : time >= duration ? (
+              <RotateCcw size={16} />
+            ) : (
+              <Play size={16} />
+            )}
+            {playing
+              ? "Pause lift"
+              : time >= duration
+                ? "Replay lift"
+                : "Watch the lift"}
+          </button>
         </div>
       </div>
     </section>
