@@ -16,6 +16,7 @@ import "./pinky.css";
 import TableMenu from "@/components/tableMenu/TableMenu";
 import SavoryCourse from "@/components/savory/SavoryCourse";
 import CafeCounter from "@/components/counter/CafeCounter";
+import ServiceFilm from "@/components/smartService/ServiceFilm";
 import WindowTableJourney from "@/components/windowTable/WindowTableJourney";
 
 const REVIEWS = [
@@ -51,6 +52,7 @@ export default function PinkyHome() {
         </Link>
         <nav aria-label="Main navigation">
           <Link to="/menu">Our menu</Link>
+          <a href="#table-service">Table service</a>
           <Link to="/reserve">Book a table</Link>
           <a href="#visit">Find us</a>
         </nav>
@@ -60,6 +62,7 @@ export default function PinkyHome() {
       </header>
       <main id="main">
         <WindowTableJourney />
+        <ServiceFilm />
         <CafeCounter />
         <SavoryCourse />
         <section className="pinky-section pinky-about">
