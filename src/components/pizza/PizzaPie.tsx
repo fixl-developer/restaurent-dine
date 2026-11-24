@@ -1,5 +1,10 @@
 import { useState, type CSSProperties } from "react";
-import { pizzaBase, pizzaIngredients, type PizzaArt } from "./ingredients";
+import {
+  pizzaBase,
+  pizzaIngredients,
+  type PizzaArt,
+  type IngredientArt,
+} from "./ingredients";
 import "./pizza.css";
 const artSettings: Record<PizzaArt, [number, number, number]> = {
   mozzarella: [48, 8, 1],
@@ -47,12 +52,15 @@ export default function PizzaPie({
   baseImageUrl,
   scale = 1,
 }: {
-  choices: { id: string; pizzaArt?: PizzaArt | null }[];
+  choices: { id: string; pizzaArt?: IngredientArt | null }[];
   baseImageUrl?: string;
   scale?: number;
 }) {
   const layers = choices
-    .filter((m) => m.pizzaArt && m.pizzaArt in pizzaIngredients)
+    .filter(
+      (m): m is { id: string; pizzaArt: PizzaArt } =>
+        !!m.pizzaArt && m.pizzaArt in pizzaIngredients,
+    )
     .sort((a, b) => artSettings[a.pizzaArt!][2] - artSettings[b.pizzaArt!][2]);
   const [failedUrl, setFailedUrl] = useState<string>();
   return (

@@ -1,0 +1,121 @@
+import { useState, type CSSProperties } from "react";
+import { Layers, RotateCw } from "lucide-react";
+import type { IngredientArt } from "./ingredients";
+import "./kitchen.css";
+
+type KitchenKind = "burger" | "taco";
+const burgerOrder = [
+  "bottom",
+  "patty",
+  "cheddar",
+  "tomato",
+  "lettuce",
+  "top",
+] as const;
+const tacoOrder = ["tortilla", "beans", "salsa", "avocado", "cheddar"] as const;
+
+// Vertical separation between each ingredient's contact surface, as a percentage of the stage.
+const burgerRise = {
+  bottom: 8,
+  patty: 8,
+  cheddar: 2,
+  tomato: 3,
+  lettuce: 4,
+  top: 0,
+};
+
+export default function KitchenPreview({
+  kind,
+  choices,
+  scale,
+}: {
+  kind: KitchenKind;
+  choices: { pizzaArt?: IngredientArt | null }[];
+  scale: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const [turns, setTurns] = useState(0);
+  const selected = new Set<string>(
+    choices.flatMap((m) => (m.pizzaArt ? [m.pizzaArt] : [])),
+  );
+  const burger = burgerOrder.filter(
+    (art) =>
+      art === "bottom" || art === "patty" || art === "top" || selected.has(art),
+  );
+  const taco = tacoOrder.filter(
+    (art) => art === "tortilla" || art === "beans" || selected.has(art),
+  );
+  const separation = open ? 19 : 0;
+  const height =
+    burger.reduce((sum, part) => sum + burgerRise[part], 0) +
+    separation * (burger.length - 1);
+  // The top bun occupies 46% of the stage at its natural aspect ratio.
+  // Fit the complete silhouette, even when all three optional layers are lifted.
+  const stackScale = Math.min(1, 92 / (height + 46));
+  let offset = (100 - height - 46) / 2;
+  return (
+    <div className={"kitchen-preview kitchen-" + kind}>
+      <div
+        className="kitchen-food"
+        style={
+          {
+            "--portion": kind === "burger" ? scale * stackScale : scale,
+          } as CSSProperties
+        }
+        aria-hidden="true"
+      >
+        {kind === "burger" ? (
+          burger.map((part) => {
+            const bottom = offset;
+            offset += burgerRise[part] + separation;
+            return (
+              <img
+                key={part}
+                className={"burger-piece piece-" + part}
+                style={{ bottom: bottom + "%" }}
+                src={"/kitchen/burger-" + part + ".webp"}
+                alt=""
+                draggable={false}
+              />
+            );
+          })
+        ) : (
+          <div
+            className="taco-plate"
+            style={{ transform: "rotate(" + (turns * 45 - 12) + "deg)" }}
+          >
+            {taco.map((part) => (
+              <img
+                key={part}
+                className={"taco-piece piece-" + part}
+                src={"/kitchen/taco-" + part + ".webp"}
+                alt=""
+                draggable={false}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      {kind === "burger" ? (
+        <button
+          type="button"
+          className="kitchen-inspect"
+          aria-pressed={open}
+          onClick={() => setOpen(!open)}
+        >
+          <Layers size={15} />
+          {open ? "Close the stack" : "Lift the layers"}
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="kitchen-inspect"
+          onClick={() => setTurns((n) => n + 1)}
+        >
+          <RotateCw size={15} />
+          Turn the taco
+        </button>
+      )}
+    </div>
+  );
+}

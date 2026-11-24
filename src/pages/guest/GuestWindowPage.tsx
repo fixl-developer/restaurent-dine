@@ -1,3 +1,4 @@
+import { builderKind } from "@/components/pizza/ingredients";
 import { useMutation } from "@tanstack/react-query";
 import { useCheckoutDraft } from "@/hooks/useCheckoutDraft";
 import { submitCheckout } from "@/lib/checkoutDraft";
@@ -518,7 +519,7 @@ export default function GuestWindowPage() {
                     </strong>
                     <button onClick={() => addItem(item)}>
                       <Plus size={15} />
-                      {item.pizzaBuilder?.enabled ? "Build your pizza" : inCart ? `${inCart} ADDED` : "ADD"}
+                      {item.pizzaBuilder?.enabled ? "Build your " + builderKind(item.pizzaBuilder) : inCart ? `${inCart} ADDED` : "ADD"}
                     </button>
                   </div>
                 </div>

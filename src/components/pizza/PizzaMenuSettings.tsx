@@ -5,8 +5,10 @@ import { api } from "@/lib/api";
 import { useCan } from "@/components/auth/Can";
 import type { ModifierDto, ModifierGroupDto } from "@/lib/dto/menu";
 import {
-  pizzaIngredients,
-  type PizzaArt,
+  builderIngredients,
+  builderKind,
+  type BuilderKind,
+  type IngredientArt,
   type PizzaBuilderConfig,
 } from "./ingredients";
 
@@ -18,25 +20,35 @@ const button =
 
 function GroupEditor({
   group,
+  kind,
   onSaved,
   onCancel,
 }: {
   group?: ModifierGroupDto;
+  kind: BuilderKind;
   onSaved: (g: ModifierGroupDto) => void;
   onCancel: () => void;
 }) {
-  const [name, setName] = useState(group?.name ?? "Pizza toppings");
-  const [limit, setLimit] = useState(group?.maxSelections ?? 7);
+  const ingredients = builderIngredients[kind];
+  const groupName = {
+    pizza: "Pizza toppings",
+    burger: "Burger layers",
+    taco: "Taco fillings",
+  }[kind];
+  const [name, setName] = useState(group?.name ?? groupName);
+  const [limit, setLimit] = useState(
+    group?.maxSelections ?? (kind === "pizza" ? 7 : 3),
+  );
   const [options, setOptions] = useState<Option[]>(
     () =>
       group?.modifiers.map((m) => ({ ...m })) ??
-      (Object.keys(pizzaIngredients) as PizzaArt[])
-        .filter((a) => a !== "pepperoni")
-        .map((a) => ({
-          name: pizzaIngredients[a],
-          pizzaArt: a,
+      Object.entries(ingredients)
+        .filter(([art]) => art !== "pepperoni")
+        .map(([art, label]) => ({
+          name: label,
+          pizzaArt: art as IngredientArt,
           priceDelta: 0,
-          isDefault: a === "mozzarella",
+          isDefault: ["mozzarella", "lettuce", "salsa"].includes(art),
           is86: false,
         })),
   );
@@ -133,12 +145,15 @@ function GroupEditor({
               value={m.pizzaArt ?? ""}
               onChange={(e) =>
                 patch(i, {
-                  pizzaArt: (e.target.value || null) as PizzaArt | null,
+                  pizzaArt: (e.target.value || null) as IngredientArt | null,
                 })
               }
             >
               <option value="">Text only</option>
-              {Object.entries(pizzaIngredients).map(([art, label]) => (
+              {m.pizzaArt && !(m.pizzaArt in ingredients) && (
+                <option value={m.pizzaArt}>{m.pizzaArt} (another dish)</option>
+              )}
+              {Object.entries(ingredients).map(([art, label]) => (
                 <option key={art} value={art}>
                   {label}
                 </option>
@@ -219,36 +234,45 @@ export default function PizzaMenuSettings({
         Customization view
         <select
           className={field}
-          value={config?.enabled ? "pizza" : "standard"}
+          value={config?.enabled ? builderKind(config) : "standard"}
           onChange={(e) => {
-            onChange(e.target.value === "pizza" ? { enabled: true } : null);
+            onChange(
+              e.target.value === "standard"
+                ? null
+                : { enabled: true, kind: e.target.value as BuilderKind },
+            );
             setEditor(null);
           }}
         >
           <option value="standard">Standard</option>
           <option value="pizza">Visual pizza builder</option>
+          <option value="burger">Visual burger builder</option>
+          <option value="taco">Visual taco builder</option>
         </select>
       </label>
       {config?.enabled && (
         <>
-          <label className="block text-sm">
-            Base image URL <span className="text-gray-500">(optional)</span>
-            <input
-              className={field}
-              type="url"
-              placeholder="Use the house tomato base"
-              value={config.baseImageUrl ?? ""}
-              onChange={(e) =>
-                onChange({
-                  ...config,
-                  baseImageUrl: e.target.value.trim() || undefined,
-                })
-              }
-            />
-          </label>
+          {builderKind(config) === "pizza" && (
+            <label className="block text-sm">
+              Base image URL <span className="text-gray-500">(optional)</span>
+              <input
+                className={field}
+                type="url"
+                placeholder="Use the house tomato base"
+                value={config.baseImageUrl ?? ""}
+                onChange={(e) =>
+                  onChange({
+                    ...config,
+                    baseImageUrl: e.target.value.trim() || undefined,
+                  })
+                }
+              />
+            </label>
+          )}
           <p className="text-sm">
-            Use a square, top-down base with transparent edges. Attach an
-            existing modifier group below or create one here.
+            {builderKind(config) === "pizza" &&
+              "Use a square, top-down base with transparent edges. "}
+            Attach an existing modifier group below or create one here.
           </p>
           {editor === null ? (
             <div className="flex flex-wrap gap-2">
@@ -276,6 +300,7 @@ export default function PizzaMenuSettings({
           ) : (
             <GroupEditor
               key={editor}
+              kind={builderKind(config)}
               group={groups.find((g) => g._id === editor)}
               onCancel={() => setEditor(null)}
               onSaved={(g) => {

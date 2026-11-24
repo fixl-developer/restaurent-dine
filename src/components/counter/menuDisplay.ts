@@ -1,3 +1,4 @@
+import { builderPhoto } from "@/components/pizza/ingredients";
 import bundledMedia from "@/config/dishMedia.json";
 import type { PublicCategory, PublicMenuItem } from "@/lib/dto/guest";
 
@@ -51,7 +52,7 @@ export function isSesameNoodles(item: PublicMenuItem) {
 }
 
 export function dishCutout(item: PublicMenuItem) {
-  return item.cutoutUrl?.trim() || localMedia(item)?.cutoutUrl || (item.pizzaBuilder?.enabled ? item.pizzaBuilder.baseImageUrl || "/pizza/base.webp" : undefined);
+  return item.cutoutUrl?.trim() || localMedia(item)?.cutoutUrl || (item.pizzaBuilder?.enabled ? builderPhoto(item.pizzaBuilder) : undefined);
 }
 
 export function caseSelection(categories: PublicCategory[]) {

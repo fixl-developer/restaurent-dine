@@ -1,4 +1,4 @@
-import type { PizzaBuilderConfig, PizzaArt } from "@/components/pizza/ingredients";
+import type { PizzaBuilderConfig, IngredientArt } from "@/components/pizza/ingredients";
 /** Menu DTOs mirroring the backend Category / Item / ModifierGroup / Combo. */
 
 export type FoodType = 'veg' | 'non_veg' | 'egg' | 'vegan';
@@ -61,7 +61,7 @@ export interface ItemDto {
 }
 
 export interface ModifierDto {
-  pizzaArt?: PizzaArt | null;
+  pizzaArt?: IngredientArt | null;
   _id: string;
   name: string;
   priceDelta: number;

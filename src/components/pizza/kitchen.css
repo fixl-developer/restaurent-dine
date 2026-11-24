@@ -1,0 +1,121 @@
+.kitchen-preview {
+  width: 100%;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0.5rem 0.5rem 0.8rem;
+  gap: 0.25rem;
+}
+.kitchen-burger {
+  background: radial-gradient(
+    ellipse at 48% 36%,
+    #ffe9b8,
+    #ebbb89 73%,
+    #d2a073
+  );
+}
+.kitchen-taco {
+  background: radial-gradient(
+    ellipse at 48% 36%,
+    #f1f3d4,
+    #c4d8b6 75%,
+    #a9c4a3
+  );
+}
+.kitchen-food {
+  position: relative;
+  width: min(100%, 39dvh, 25rem);
+  aspect-ratio: 1;
+  transform: scale(var(--portion));
+  transition: transform 0.24s;
+}
+.burger-piece,
+.taco-piece {
+  position: absolute;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+}
+.burger-piece {
+  left: 50%;
+  width: 75%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 2px 2px #47251438);
+  transition: bottom 0.42s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.burger-piece.piece-cheddar,
+.burger-piece.piece-lettuce {
+  width: 78%;
+}
+.burger-piece.piece-tomato {
+  width: 67%;
+}
+.taco-plate {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: #f5e8cb;
+  box-shadow:
+    inset 0 0 0 3px #f6eedc,
+    inset 0 0 0 5px #b79777,
+    inset 0 0 0 9px #f6eedc,
+    0 7px 9px #53654438;
+  transition: transform 0.5s ease;
+}
+.taco-piece {
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+}
+.taco-piece.piece-tortilla {
+  width: 88%;
+}
+.taco-piece.piece-beans {
+  width: 68%;
+}
+.taco-piece.piece-salsa {
+  width: 53%;
+  top: 44%;
+}
+.taco-piece.piece-avocado {
+  width: 36%;
+  top: 54%;
+  left: 58%;
+  rotate: -5deg;
+}
+.taco-piece.piece-cheddar {
+  width: 51%;
+  top: 58%;
+  left: 47%;
+}
+.kitchen-inspect {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.8rem;
+  color: #422c22;
+  background: #fffaed;
+  border: 1px solid #72554066;
+  font-size: 0.82rem;
+  font-weight: 650;
+  border-radius: 2rem;
+}
+@media (max-width: 680px) {
+  .kitchen-preview {
+    padding: 0.15rem 0.5rem 0.45rem;
+  }
+  .kitchen-food {
+    width: min(53vw, 24dvh);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kitchen-food,
+  .burger-piece,
+  .taco-plate {
+    transition: none;
+  }
+}

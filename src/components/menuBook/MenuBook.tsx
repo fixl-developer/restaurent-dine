@@ -1,3 +1,4 @@
+import { builderKind } from "@/components/pizza/ingredients";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Utensils, Plus, Rotate3d } from "lucide-react";
 import { hasDishModel, startingPrice } from "@/components/counter/menuDisplay";
@@ -61,7 +62,7 @@ export default function MenuBook({ collection, items, categories, formatPrice, q
         <div className="mb-order">
           <strong>{item.variants.length > 0 && <small>From </small>}{formatPrice(startingPrice(item))}</strong>
           <button type="button" tabIndex={decorative ? -1 : 0} onClick={() => onAdd(item)}>
-            <Plus size={16} /> {item.pizzaBuilder?.enabled ? "Build your pizza" : quantity ? `Add again · ${quantity} in bag` : "Add to bag"}
+            <Plus size={16} /> {item.pizzaBuilder?.enabled ? "Build your " + builderKind(item.pizzaBuilder) : quantity ? `Add again · ${quantity} in bag` : "Add to bag"}
           </button>
           {hasDishModel(item) && (
             <button type="button" className="mb-inspect" tabIndex={decorative ? -1 : 0} onClick={() => onInspect(item)}>

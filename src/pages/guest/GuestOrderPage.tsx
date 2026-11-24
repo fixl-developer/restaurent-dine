@@ -1,6 +1,6 @@
 import { recipeSelection } from "@/components/pizza/recipeSelection";
 import PizzaBuilder from "@/components/pizza/PizzaBuilder";
-import { pizzaBase } from "@/components/pizza/ingredients";
+import { builderKind, builderPhoto } from "@/components/pizza/ingredients";
 import GuestVisit, { type VisitAccess } from "@/components/tableService/GuestVisit";
 import { useMutation } from "@tanstack/react-query";
 import { useCheckoutDraft } from "@/hooks/useCheckoutDraft";
@@ -610,7 +610,7 @@ function MenuItemCard({
       <div className="shrink-0">
         {item.imageUrl || item.pizzaBuilder?.enabled ? (
           <img
-            src={item.imageUrl || item.pizzaBuilder?.baseImageUrl || pizzaBase}
+            src={item.imageUrl || (item.pizzaBuilder ? builderPhoto(item.pizzaBuilder) : undefined)}
             alt={item.name}
             className="w-20 h-20 rounded-xl object-cover mb-2"
           />
@@ -631,7 +631,7 @@ function MenuItemCard({
             onClick={onAdd}
             className="w-20 py-1.5 border border-brand-500 text-brand-600 rounded-lg text-xs font-bold hover:bg-brand-50 transition-colors flex items-center justify-center gap-1"
           >
-            {item.pizzaBuilder?.enabled ? "Build your pizza" : <><Plus className="w-3 h-3" /> ADD</>}
+            {item.pizzaBuilder?.enabled ? "Build your " + builderKind(item.pizzaBuilder) : <><Plus className="w-3 h-3" /> ADD</>}
             {hasOptions && !item.pizzaBuilder?.enabled && <span className="text-[8px] ml-0.5">+</span>}
           </button>
         )}

@@ -4,7 +4,12 @@ import { Check, Flame, Package, RotateCcw } from "lucide-react";
 import { usePublicMenu } from "@/hooks/useGuest";
 import type { PublicMenuItem, PublicModifierGroup } from "@/lib/dto/guest";
 import PizzaPie from "./PizzaPie";
-import { pizzaIngredients, type PizzaArt } from "./ingredients";
+import {
+  builderKind,
+  ingredientPhoto,
+  pizzaIngredients,
+  type PizzaArt,
+} from "./ingredients";
 import { recipeSelection } from "./recipeSelection";
 import "./workshop.css";
 
@@ -269,11 +274,11 @@ function Workbench({ item }: { item?: PublicMenuItem }) {
                       aria-pressed={selected[g.id]?.includes(m.id) ?? false}
                       onClick={() => choose(g, m.id)}
                     >
-                      {m.pizzaArt && (
+                      {ingredientPhoto("pizza", m.pizzaArt) && (
                         <img
                           loading="lazy"
                           draggable={false}
-                          src={"/pizza/" + m.pizzaArt + ".webp"}
+                          src={ingredientPhoto("pizza", m.pizzaArt)}
                           alt=""
                         />
                       )}
@@ -309,6 +314,8 @@ export default function PizzaWorkshop() {
   const { data } = usePublicMenu({ channel: "window" });
   const item = data?.categories
     .flatMap((c) => c.items)
-    .find((i) => i.pizzaBuilder?.enabled);
+    .find(
+      (i) => i.pizzaBuilder?.enabled && builderKind(i.pizzaBuilder) === "pizza",
+    );
   return <Workbench key={item?.id ?? "sample"} item={item} />;
 }

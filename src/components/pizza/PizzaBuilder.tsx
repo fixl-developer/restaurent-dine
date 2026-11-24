@@ -1,3 +1,5 @@
+import KitchenPreview from "./KitchenPreview";
+import { builderKind, ingredientPhoto } from "./ingredients";
 import PizzaPie from "./PizzaPie";
 import { Check, X } from "lucide-react";
 import Dialog from "@/components/ui/Dialog";
@@ -32,6 +34,12 @@ export default function PizzaBuilder({
   onClose,
   onAdd,
 }: Props) {
+  const kind = builderKind(item.pizzaBuilder);
+  const base = {
+    pizza: "Tomato base",
+    burger: "Bun and patty",
+    taco: "Tortilla and beans",
+  }[kind];
   const choices = item.modifierGroups.flatMap((g) =>
     g.modifiers.filter((m) => selected[g.id]?.includes(m.id)),
   );
@@ -43,7 +51,7 @@ export default function PizzaBuilder({
   return (
     <Dialog
       onClose={onClose}
-      label={"Build your pizza: " + item.name}
+      label={"Build your " + kind + ": " + item.name}
       className="pizza-dialog"
     >
       <div className="pizza-scrim" onClick={onClose} />
@@ -52,14 +60,14 @@ export default function PizzaBuilder({
           <div>
             <p>{item.name}</p>
             <h2>
-              Build your <em>pizza.</em>
+              Build your <em>{kind}.</em>
             </h2>
           </div>
           <button
             type="button"
             className="pizza-close"
             onClick={onClose}
-            aria-label="Close pizza builder"
+            aria-label={"Close " + kind + " builder"}
           >
             <X />
           </button>
@@ -67,18 +75,20 @@ export default function PizzaBuilder({
         <div className="pizza-content">
           <div
             className="pizza-stage"
-            role="img"
+            role={kind === "pizza" ? "img" : "group"}
             aria-label={
-              item.name +
-              ", " +
-              (choices.map((m) => m.name).join(", ") || "tomato base")
+              item.name + ", " + (choices.map((m) => m.name).join(", ") || base)
             }
           >
-            <PizzaPie
-              choices={choices}
-              baseImageUrl={item.pizzaBuilder?.baseImageUrl}
-              scale={scale}
-            />
+            {kind === "pizza" ? (
+              <PizzaPie
+                choices={choices}
+                baseImageUrl={item.pizzaBuilder?.baseImageUrl}
+                scale={scale}
+              />
+            ) : (
+              <KitchenPreview kind={kind} choices={choices} scale={scale} />
+            )}
           </div>
           <div className="pizza-options">
             {!!item.variants.length && (
@@ -120,8 +130,8 @@ export default function PizzaBuilder({
                         aria-pressed={on}
                         onClick={() => toggle(g, m.id)}
                       >
-                        {m.pizzaArt && (
-                          <img src={"/pizza/" + m.pizzaArt + ".webp"} alt="" />
+                        {ingredientPhoto(kind, m.pizzaArt) && (
+                          <img src={ingredientPhoto(kind, m.pizzaArt)} alt="" />
                         )}
                         {on && <Check className="pizza-tick" size={15} />}
                         <strong>{m.name}</strong>
@@ -153,7 +163,7 @@ export default function PizzaBuilder({
           <p aria-live="polite">
             {missing
               ? "Choose " + missing.name + " to continue"
-              : choices.map((m) => m.name).join(" · ") || "Tomato base"}
+              : choices.map((m) => m.name).join(" · ") || base}
           </p>
           <button className="pizza-add" disabled={!!missing} onClick={onAdd}>
             Add to order <strong>{fmt(total)}</strong>
