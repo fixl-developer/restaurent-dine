@@ -202,7 +202,7 @@ function Workbench({ item }: { item?: PublicMenuItem }) {
             aria-label={
               stage === "boxed"
                 ? "Closed Pinky Promise pizza box"
-                : "Open pizza box with " +
+                : "Open Pinky Promise Café & Restaurant pizza box with " +
                   (selectedOptions.map((m) => m.name).join(", ") ||
                     "tomato base")
             }
@@ -227,7 +227,16 @@ function Workbench({ item }: { item?: PublicMenuItem }) {
             <div className="pw-wall pw-left" />
             <div className="pw-wall pw-right" />
             <div className="pw-lid">
-              <div className="pw-lid-inside" />
+              <div className="pw-lid-inside">
+                <div className="pw-lid-stamp">
+                  <img
+                    src="/brand/logo.png"
+                    alt=""
+                    draggable={false}
+                    loading="lazy"
+                  />
+                </div>
+              </div>
               <div className="pw-lid-print" />
             </div>
           </div>
