@@ -71,6 +71,7 @@ export default function GuestWindowPage() {
   const [customizingItem, setCustomizingItem] = useState<PublicMenuItem | null>(
     null,
   );
+  const [initialToppings, setInitialToppings] = useState<string[]>();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const qrSlug = params.get("qr") ?? undefined;
@@ -135,11 +136,16 @@ export default function GuestWindowPage() {
     const item = menu.categories
       .flatMap((category) => category.items)
       .find((candidate) => candidate.id === id);
-    if (item && hasDishModel(item)) setInspection(item);
+    const recipe = params.get("recipe");
+    setInitialToppings(
+      item?.pizzaBuilder?.enabled && recipe !== null ? recipe.split(",").filter(Boolean) : undefined,
+    );
+    if (item && !item.pizzaBuilder?.enabled && hasDishModel(item)) setInspection(item);
     else if (item) setCustomizingItem(item);
     else toast.info("This item is no longer on the menu.");
     const next = new URLSearchParams(params);
     next.delete("item");
+    next.delete("recipe");
     setParams(next, { replace: true });
   }, [menu, params, setParams]);
 
@@ -160,6 +166,7 @@ export default function GuestWindowPage() {
   }, [menu, search, activeCategory]);
 
   function addItem(item: PublicMenuItem) {
+    setInitialToppings(undefined);
     if (item.pizzaBuilder?.enabled || item.variants.length > 0 || item.modifierGroups.length > 0) {
       setCustomizingItem(item);
       return;
@@ -358,6 +365,7 @@ export default function GuestWindowPage() {
         <CustomizeModal
           fmt={fmtINR}
           item={customizingItem}
+          initialToppings={initialToppings}
           onClose={() => setCustomizingItem(null)}
           onAdd={(line) => {
             setCart((previous) => [...previous, line]);

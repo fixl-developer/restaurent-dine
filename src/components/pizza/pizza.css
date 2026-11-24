@@ -14,7 +14,7 @@
 }
 .pizza-builder {
   position: relative;
-  width: min(100%, 65rem);
+  width: min(100%, 55rem);
   max-height: 92dvh;
   display: flex;
   flex-direction: column;
@@ -30,7 +30,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.6rem;
+  padding: 0.66rem 1rem;
 }
 .pizza-head {
   border-bottom: 1px solid #ffffff22;
@@ -43,7 +43,7 @@
 }
 .pizza-head h2 {
   font:
-    500 clamp(2rem, 3.4vw, 3.1rem)/1.1 Georgia,
+    500 clamp(1.6rem, 2.6vw, 2.25rem)/1.05 Georgia,
     serif;
   letter-spacing: -0.055em;
 }
@@ -60,7 +60,7 @@
 }
 .pizza-content {
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
+  grid-template-columns: 0.88fr 1.12fr;
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
@@ -77,7 +77,7 @@
 }
 .pizza-pie {
   position: relative;
-  width: 93%;
+  width: min(91%, 55dvh);
   aspect-ratio: 1;
   transform: scale(var(--size));
   transition: transform 0.32s ease;
@@ -117,10 +117,10 @@
   }
 }
 .pizza-options {
-  padding: 1.25rem 1.4rem;
+  padding: 0.8rem 1rem;
 }
 .pizza-options fieldset {
-  margin: 0 0 1.25rem;
+  margin: 0 0 0.7rem;
   min-width: 0;
 }
 .pizza-options legend {
@@ -146,7 +146,7 @@
   border: 1px solid #654b5b;
   border-radius: 0.7rem;
   min-height: 44px;
-  padding: 0.5rem 0.2rem;
+  padding: 0.3rem 0.2rem;
   overflow-wrap: anywhere;
 }
 .pizza-sizes button[aria-pressed="true"],
@@ -155,7 +155,7 @@
   border-color: #ffc198;
 }
 .pizza-tiles img {
-  height: 2rem;
+  height: 1.45rem;
   width: 3rem;
   object-fit: contain;
   margin: 0 auto 0.2rem;
@@ -237,7 +237,7 @@
     flex: none;
   }
   .pizza-pie {
-    width: min(82vw, 35dvh);
+    width: min(72vw, 28dvh);
   }
   .pizza-builder footer {
     display: grid;
@@ -250,10 +250,10 @@
     overflow: auto;
   }
   .pizza-tiles img {
-    height: 1.7rem;
+    height: 1.4rem;
   }
   .pizza-options fieldset {
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.55rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -304,5 +304,31 @@
 @media (max-width: 359px) {
   .pizza-tiles {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 681px) {
+  .pizza-content {
+    overflow: hidden;
+  }
+  .pizza-stage {
+    align-self: stretch;
+    min-height: 0;
+    position: relative;
+  }
+  .pizza-options {
+    overflow: auto;
+    scrollbar-width: thin;
+  }
+  .pizza-sizes button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .pizza-builder footer,
+  .pizza-head {
+    flex: none;
   }
 }

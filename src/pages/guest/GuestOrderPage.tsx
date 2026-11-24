@@ -1,3 +1,4 @@
+import { recipeSelection } from "@/components/pizza/recipeSelection";
 import PizzaBuilder from "@/components/pizza/PizzaBuilder";
 import { pizzaBase } from "@/components/pizza/ingredients";
 import GuestVisit, { type VisitAccess } from "@/components/tableService/GuestVisit";
@@ -643,16 +644,18 @@ function MenuItemCard({
 export function CustomizeModal({
   fmt,
   item,
+  initialToppings,
   onClose,
   onAdd,
 }: {
+  initialToppings?: string[];
   fmt: (amount: number) => string;
   item: PublicMenuItem;
   onClose: () => void;
   onAdd: (line: GuestCartLine) => void;
 }) {
   const [variantId, setVariantId] = useState(item.variants[0]?.id);
-  const [selectedMods, setSelectedMods] = useState<Record<string, string[]>>(() => Object.fromEntries(item.modifierGroups.map(g => [g.id, g.modifiers.filter(m=>m.isDefault).slice(0,g.maxSelections || undefined).map(m=>m.id)])));
+  const [selectedMods, setSelectedMods] = useState<Record<string, string[]>>(() => recipeSelection(item.modifierGroups, initialToppings));
   const [notes, setNotes] = useState("");
 
   function toggleMod(group: PublicModifierGroup, modifierId: string) {

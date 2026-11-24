@@ -1,0 +1,371 @@
+.pw {
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  color: #51202a;
+  background-color: #f6ddd0;
+  background-image:
+    linear-gradient(90deg, #d5897b0a 1px, transparent 1px),
+    linear-gradient(#d5897b0a 1px, transparent 1px),
+    radial-gradient(ellipse at 73% 44%, #fff4e8 0, transparent 62%);
+  background-size:
+    24px 24px,
+    24px 24px,
+    100% 100%;
+}
+.pw-inner {
+  max-width: 86rem;
+  margin: auto;
+  padding: clamp(2.6rem, 6vw, 6rem) 6%;
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.76fr) minmax(0, 1.24fr);
+  column-gap: 4%;
+  align-items: center;
+}
+.pw-head {
+  grid-area: 1/1;
+  align-self: end;
+}
+.pw-head p,
+.pw-counter legend {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #843944;
+}
+.pinky-site .pw-head h2 {
+  font:
+    500 clamp(2.9rem, 5vw, 5.9rem)/0.96 Georgia,
+    serif;
+  letter-spacing: -0.065em;
+  margin: 0.55rem 0 0.9rem;
+  max-width: 8ch;
+  color: #4c202a;
+}
+.pw-head h2 em {
+  color: #ab382a;
+}
+.pw-counter {
+  grid-area: 2/1;
+  align-self: start;
+}
+.pw-instruction {
+  min-height: 2.8em;
+  max-width: 36ch;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.pw-groups {
+  max-height: 20rem;
+  overflow: auto;
+}
+.pw-counter fieldset {
+  min-width: 0;
+  margin: 0.7rem 0;
+}
+.pw-ingredients {
+  margin-top: 0.4rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+.pw-ingredients button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.2rem;
+  min-height: 3.4rem;
+  padding: 0.35rem 0.15rem;
+  background: #fff4e8c4;
+  border: 1px solid #d3a798;
+  border-radius: 0.55rem;
+  color: #542831;
+  font-size: 0.79rem;
+  line-height: 1.12;
+  font-weight: 650;
+  cursor: grab;
+  overflow-wrap: anywhere;
+}
+.pw-ingredients button[aria-pressed="true"] {
+  background: #fff8ed;
+  border-color: #9b4237;
+}
+.pw-ingredients svg {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+.pw-ingredients img {
+  width: 2.3rem;
+  height: 1.7rem;
+  object-fit: contain;
+}
+.pw-counter fieldset:disabled button {
+  cursor: default;
+}
+.pw-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+.pw-actions button,
+.pw-actions a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff6e7;
+  background: #7a2836;
+  border-radius: 2rem;
+  padding: 0.55rem 1rem;
+  font-weight: 650;
+}
+.pw-actions a {
+  color: #6d2732;
+  background: #fff5e7;
+}
+.pw :focus-visible {
+  outline: 3px solid #7a2836;
+  outline-offset: 2px;
+}
+.pw-bench {
+  grid-area: 1/2/3/3;
+  display: grid;
+  place-items: center;
+  position: relative;
+  perspective: 1000px;
+  min-width: 0;
+  height: clamp(23rem, 41vw, 39rem);
+}
+.pw-box {
+  position: relative;
+  width: min(81%, 32rem);
+  aspect-ratio: 1;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(27deg + var(--nod, 0deg)))
+    rotateY(calc(-8deg + var(--lean, 0deg))) rotateZ(-9deg);
+  transition: transform 0.22s ease-out;
+}
+.pw-box::before {
+  content: "";
+  position: absolute;
+  inset: 4% -2% -4% 2%;
+  background: #683a2d5c;
+  filter: blur(16px);
+  transform: translateZ(-21px);
+}
+.pw-floor,
+.pw-paper,
+.pw-food,
+.pw-lid,
+.pw-lid-inside,
+.pw-lid-print,
+.pw-heat {
+  position: absolute;
+  inset: 0;
+}
+.pw-floor,
+.pw-wall,
+.pw-lid-inside {
+  background: repeating-linear-gradient(
+    97deg,
+    #c9a179 0px,
+    #d7b188 2px,
+    #dcbb96 4px
+  );
+  border: 1px solid #a87a54;
+}
+.pw-paper {
+  inset: 1.8%;
+  background:
+    repeating-linear-gradient(45deg, #f2deba2b 0 2px, transparent 3px 8px),
+    #fff2d8;
+  transform: translateZ(2px);
+  box-shadow: inset 0 0 12px #93674731;
+}
+.pw-food {
+  inset: 4.5%;
+  transform: translateZ(8px);
+  transition: filter 1.35s;
+  filter: drop-shadow(2px 4px 3px #59291755);
+}
+.pw-food .pizza-pie {
+  width: 100%;
+  height: 100%;
+}
+.pw[data-stage="baking"] .pw-food,
+.pw[data-stage="baked"] .pw-food,
+.pw[data-stage="boxed"] .pw-food {
+  filter: sepia(0.23) saturate(1.28) brightness(0.9) contrast(1.12)
+    drop-shadow(2px 4px 4px #59291777);
+}
+.pw-wall {
+  position: absolute;
+}
+.pw-front,
+.pw-back {
+  height: 16px;
+  left: 0;
+  right: 0;
+  transform: rotateX(-90deg);
+  transform-origin: top;
+}
+.pw-front {
+  top: 100%;
+}
+.pw-back {
+  top: 0;
+}
+.pw-left,
+.pw-right {
+  width: 16px;
+  top: 0;
+  bottom: 0;
+  transform-origin: left;
+  transform: rotateY(90deg);
+}
+.pw-left {
+  left: 0;
+}
+.pw-right {
+  left: 100%;
+}
+.pw-lid {
+  transform-origin: top;
+  transform-style: preserve-3d;
+  transform: translateZ(16px) rotateX(111deg);
+  transition: transform 1s cubic-bezier(0.46, 0.03, 0.24, 1);
+}
+.pw-lid-inside,
+.pw-lid-print {
+  backface-visibility: hidden;
+}
+.pw-lid-inside {
+  transform: rotateY(180deg);
+  background-color: #ddb993;
+  box-shadow: inset 0 0 18px #a4794e44;
+}
+.pw-lid-print {
+  background: #eed5b3 url("/pizza/box-print.webp") center/cover;
+  border: 2px solid #b58963;
+  transform: translateZ(1px);
+}
+.pw[data-stage="boxed"] .pw-lid {
+  transform: translateZ(16px) rotateX(0deg);
+}
+.pw-heat {
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5%;
+  transform: translateZ(38px);
+}
+.pw-heat i {
+  opacity: 0;
+  width: 6%;
+  height: 15%;
+  border-left: 3px solid #ffefc3;
+  border-radius: 60%;
+  filter: blur(2px);
+}
+.pw[data-stage="baking"] .pw-heat i {
+  animation: pw-steam 0.8s ease-out infinite;
+}
+.pw[data-stage="baking"] .pw-heat i:nth-child(2) {
+  animation-delay: 0.19s;
+}
+.pw[data-stage="baking"] .pw-heat i:nth-child(3) {
+  animation-delay: 0.36s;
+}
+@keyframes pw-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  35% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-90%) rotate(14deg);
+  }
+}
+.pw-bench[data-over="true"] .pw-paper {
+  background-color: #ffe0a4;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .pw {
+      view-timeline-name: --pizza-counter;
+    }
+    .pw-box {
+      animation: pw-parallax linear both;
+      animation-timeline: --pizza-counter;
+    }
+    @keyframes pw-parallax {
+      from {
+        translate: 0 18px;
+      }
+      to {
+        translate: 0 -18px;
+      }
+    }
+  }
+}
+@media (max-width: 760px) {
+  .pw-inner {
+    padding: 2.45rem 5% 2.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.45rem;
+  }
+  .pw-head,
+  .pw-counter {
+    align-self: stretch;
+  }
+  .pinky-site .pw-head h2 {
+    max-width: none;
+    font-size: clamp(2.35rem, 8vw, 3.8rem);
+  }
+  .pw-bench {
+    height: clamp(17rem, 67vw, 27rem);
+    clip-path: inset(0 -4% -4%);
+  }
+  .pw-box {
+    width: min(67%, 21rem);
+  }
+  .pw-instruction {
+    min-height: 0;
+    max-width: none;
+  }
+  .pw-ingredients {
+    grid-template-columns: repeat(auto-fit, minmax(3.9rem, 1fr));
+  }
+  .pw-groups {
+    max-height: none;
+  }
+  .pw-ingredients button {
+    min-height: 3.3rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pw-box,
+  .pw-lid,
+  .pw-food {
+    transition: none;
+  }
+  .pw[data-stage="baking"] .pw-heat i {
+    animation: none;
+  }
+  .pw .pizza-layer img {
+    animation: none;
+  }
+}

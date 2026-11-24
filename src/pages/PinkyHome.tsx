@@ -15,6 +15,7 @@ import { usePublicRestaurant } from "@/hooks/useRestaurant";
 import "./pinky.css";
 import TableMenu from "@/components/tableMenu/TableMenu";
 import SavoryCourse from "@/components/savory/SavoryCourse";
+import PizzaWorkshop from "@/components/pizza/PizzaWorkshop";
 import CafeCounter from "@/components/counter/CafeCounter";
 import ServiceFilm from "@/components/smartService/ServiceFilm";
 import WindowTableJourney from "@/components/windowTable/WindowTableJourney";
@@ -64,6 +65,7 @@ export default function PinkyHome() {
         <WindowTableJourney />
         <ServiceFilm />
         <CafeCounter />
+        <PizzaWorkshop />
         <SavoryCourse />
         <section className="pinky-section pinky-about">
           <div className="pinky-about-art">
