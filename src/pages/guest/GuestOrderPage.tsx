@@ -1,3 +1,5 @@
+import PizzaBuilder from "@/components/pizza/PizzaBuilder";
+import { pizzaBase } from "@/components/pizza/ingredients";
 import GuestVisit, { type VisitAccess } from "@/components/tableService/GuestVisit";
 import { useMutation } from "@tanstack/react-query";
 import { useCheckoutDraft } from "@/hooks/useCheckoutDraft";
@@ -139,7 +141,7 @@ function GuestMenu({access}:{access:VisitAccess}) {
       document.querySelector<HTMLElement>('[aria-label="Table service"]')?.scrollIntoView({block:"center"});
       return;
     }
-    if (item.modifierGroups.length > 0 || item.variants.length > 0) {
+    if (item.pizzaBuilder?.enabled || item.modifierGroups.length > 0 || item.variants.length > 0) {
       setCustomizingItem(item);
       return;
     }
@@ -605,9 +607,9 @@ function MenuItemCard({
         </div>
       </div>
       <div className="shrink-0">
-        {item.imageUrl ? (
+        {item.imageUrl || item.pizzaBuilder?.enabled ? (
           <img
-            src={item.imageUrl}
+            src={item.imageUrl || item.pizzaBuilder?.baseImageUrl || pizzaBase}
             alt={item.name}
             className="w-20 h-20 rounded-xl object-cover mb-2"
           />
@@ -621,15 +623,15 @@ function MenuItemCard({
             onClick={onAdd}
             className="w-20 py-1.5 bg-[var(--promise-berry)] text-white rounded-lg text-xs font-bold"
           >
-            {cartQty} ADDED
+            {item.pizzaBuilder?.enabled ? "Build another" : cartQty + " ADDED"}
           </button>
         ) : (
           <button
             onClick={onAdd}
             className="w-20 py-1.5 border border-brand-500 text-brand-600 rounded-lg text-xs font-bold hover:bg-brand-50 transition-colors flex items-center justify-center gap-1"
           >
-            <Plus className="w-3 h-3" /> ADD
-            {hasOptions && <span className="text-[8px] ml-0.5">+</span>}
+            {item.pizzaBuilder?.enabled ? "Build your pizza" : <><Plus className="w-3 h-3" /> ADD</>}
+            {hasOptions && !item.pizzaBuilder?.enabled && <span className="text-[8px] ml-0.5">+</span>}
           </button>
         )}
       </div>
@@ -650,9 +652,7 @@ export function CustomizeModal({
   onAdd: (line: GuestCartLine) => void;
 }) {
   const [variantId, setVariantId] = useState(item.variants[0]?.id);
-  const [selectedMods, setSelectedMods] = useState<Record<string, string[]>>(
-    {},
-  );
+  const [selectedMods, setSelectedMods] = useState<Record<string, string[]>>(() => Object.fromEntries(item.modifierGroups.map(g => [g.id, g.modifiers.filter(m=>m.isDefault).slice(0,g.maxSelections || undefined).map(m=>m.id)])));
   const [notes, setNotes] = useState("");
 
   function toggleMod(group: PublicModifierGroup, modifierId: string) {
@@ -727,6 +727,10 @@ export function CustomizeModal({
       lineTotal,
     });
   }
+
+  if (item.pizzaBuilder?.enabled) return <PizzaBuilder item={item} variantId={variantId} setVariantId={setVariantId}
+    selected={selectedMods} toggle={toggleMod} notes={notes} setNotes={setNotes} total={lineTotal} fmt={fmt}
+    missing={missingRequired} onClose={onClose} onAdd={submit}/>;
 
   return (
     <Dialog

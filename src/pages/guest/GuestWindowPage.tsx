@@ -160,7 +160,7 @@ export default function GuestWindowPage() {
   }, [menu, search, activeCategory]);
 
   function addItem(item: PublicMenuItem) {
-    if (item.variants.length > 0 || item.modifierGroups.length > 0) {
+    if (item.pizzaBuilder?.enabled || item.variants.length > 0 || item.modifierGroups.length > 0) {
       setCustomizingItem(item);
       return;
     }
@@ -510,7 +510,7 @@ export default function GuestWindowPage() {
                     </strong>
                     <button onClick={() => addItem(item)}>
                       <Plus size={15} />
-                      {inCart ? `${inCart} ADDED` : "ADD"}
+                      {item.pizzaBuilder?.enabled ? "Build your pizza" : inCart ? `${inCart} ADDED` : "ADD"}
                     </button>
                   </div>
                 </div>
@@ -630,6 +630,9 @@ export default function GuestWindowPage() {
                     <p className="text-sm font-semibold text-gray-900">
                       {line.name}
                     </p>
+                    {(line.variantName || line.modifiers.length > 0) && <p className="text-xs text-gray-600">
+                      {[line.variantName,...line.modifiers.map(m=>m.name)].filter(Boolean).join(" · ")}</p>}
+                    {line.notes && <p className="text-xs text-gray-600">{line.notes}</p>}
                     <p className="text-sm font-bold text-gray-900 mt-1">
                       {fmtINR(line.lineTotal)}
                     </p>

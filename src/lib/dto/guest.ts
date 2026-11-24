@@ -1,3 +1,4 @@
+import type { PizzaBuilderConfig, PizzaArt } from "@/components/pizza/ingredients";
 /** Guest-facing (public) DTOs. */
 
 import type {
@@ -17,6 +18,7 @@ export interface PublicVariant {
 }
 
 export interface PublicModifier {
+  pizzaArt?: PizzaArt | null;
   id: string;
   name: string;
   priceDelta: number;
@@ -33,6 +35,7 @@ export interface PublicModifierGroup {
 }
 
 export interface PublicMenuItem {
+  pizzaBuilder?: PizzaBuilderConfig | null;
   id: string;
   slug: string;
   name: string;

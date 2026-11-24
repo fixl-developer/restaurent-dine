@@ -1,3 +1,5 @@
+import PizzaMenuSettings from "@/components/pizza/PizzaMenuSettings";
+import type { PizzaBuilderConfig } from "@/components/pizza/ingredients";
 import { useCan } from "@/components/auth/Can";
 import Dialog from "@/components/ui/Dialog";
 import ResizeHandle from "@/components/ui/ResizeHandle";
@@ -51,6 +53,7 @@ import {
 import { confirmToast } from "@/lib/confirmToast";
 
 interface ItemFormState {
+  pizzaBuilder: PizzaBuilderConfig | null;
   name: string;
   description: string;
   categoryId: string;
@@ -68,6 +71,7 @@ interface ItemFormState {
 }
 
 const emptyForm = (categoryId: string): ItemFormState => ({
+  pizzaBuilder: null,
   name: "",
   description: "",
   categoryId,
@@ -86,6 +90,7 @@ const emptyForm = (categoryId: string): ItemFormState => ({
 
 function formFromItem(item: ItemDto): ItemFormState {
   return {
+    pizzaBuilder: item.pizzaBuilder ?? null,
     name: item.name,
     description: item.description ?? "",
     categoryId: item.categoryId,
@@ -114,6 +119,7 @@ function buildItemPayload(form: ItemFormState): CreateItemInput {
       .map((p) => p.trim())
       .filter(Boolean);
   return {
+    pizzaBuilder: form.pizzaBuilder,
     name: form.name.trim(),
     description: form.description.trim() || undefined,
     categoryId: form.categoryId,
@@ -128,7 +134,7 @@ function buildItemPayload(form: ItemFormState): CreateItemInput {
     station: form.station.trim() || undefined,
     variants: form.variants
       .filter((v) => v.name.trim() && v.absolutePrice > 0)
-      .map((v) => ({ name: v.name.trim(), absolutePrice: v.absolutePrice })),
+      .map((v) => ({ _id: v._id, name: v.name.trim(), absolutePrice: v.absolutePrice })),
     modifierGroupIds: form.modifierGroupIds,
   };
 }
@@ -234,6 +240,8 @@ export default function AdminMenuManagement() {
     }
     const payload = buildItemPayload(form);
     if (editing) {
+      // Do not replace size subdocuments when only artwork or topping settings changed.
+      if (JSON.stringify(form.variants) === JSON.stringify(formFromItem(editing).variants)) delete payload.variants;
       updateItem.mutate(
         { id: editing._id, patch: payload },
         { onSuccess: () => setDrawerOpen(false) },
@@ -1088,6 +1096,10 @@ export default function AdminMenuManagement() {
                 )}
               </div>
 
+              <PizzaMenuSettings config={form.pizzaBuilder}
+                onChange={pizzaBuilder=>setForm(f=>({...f,pizzaBuilder}))}
+                groups={modifierGroups.filter(g=>form.modifierGroupIds.includes(g._id))}
+                onAttach={id=>setForm(f=>({...f,modifierGroupIds:[...new Set([...f.modifierGroupIds,id])]}))} />
               {/* Modifier Groups */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-2">
