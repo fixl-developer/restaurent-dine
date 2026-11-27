@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="tjg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#62C856"/>
+      <stop offset="100%" stop-color="#2A8A2A"/>
+    </radialGradient>
+  </defs>
+  <g transform="rotate(-18,46,66)">
+    <ellipse cx="46" cy="66" rx="22" ry="14" fill="url(#tjg)" stroke="#186818" stroke-width="1.5"/>
+    <ellipse cx="46" cy="66" rx="14" ry="9" fill="none" stroke="#42AA42" stroke-width="0.8" opacity="0.6"/>
+    <circle cx="40" cy="60" r="2.5" fill="#E8F8C0" opacity="0.9"/>
+    <circle cx="52" cy="71" r="2.5" fill="#E8F8C0" opacity="0.9"/>
+  </g>
+  <g transform="rotate(6,74,54)">
+    <ellipse cx="74" cy="54" rx="22" ry="14" fill="url(#tjg)" stroke="#186818" stroke-width="1.5"/>
+    <ellipse cx="74" cy="54" rx="14" ry="9" fill="none" stroke="#42AA42" stroke-width="0.8" opacity="0.6"/>
+    <circle cx="68" cy="48" r="2.5" fill="#E8F8C0" opacity="0.9"/>
+    <circle cx="80" cy="59" r="2.5" fill="#E8F8C0" opacity="0.9"/>
+  </g>
+  <g transform="rotate(-5,58,80)">
+    <ellipse cx="58" cy="80" rx="22" ry="14" fill="url(#tjg)" stroke="#186818" stroke-width="1.5"/>
+    <ellipse cx="58" cy="80" rx="14" ry="9" fill="none" stroke="#42AA42" stroke-width="0.8" opacity="0.6"/>
+    <circle cx="52" cy="74" r="2.5" fill="#E8F8C0" opacity="0.9"/>
+    <circle cx="64" cy="85" r="2.5" fill="#E8F8C0" opacity="0.9"/>
+  </g>
+</svg>

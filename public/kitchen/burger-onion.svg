@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80">
+  <defs>
+    <linearGradient id="og1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B87220"/>
+      <stop offset="50%" stop-color="#E09A30"/>
+      <stop offset="100%" stop-color="#B87220"/>
+    </linearGradient>
+    <linearGradient id="og2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C88028"/>
+      <stop offset="50%" stop-color="#F0B040"/>
+      <stop offset="100%" stop-color="#B87220"/>
+    </linearGradient>
+  </defs>
+  <path d="M18,52 C58,24 100,62 148,28 C196,52 238,20 285,44" stroke="url(#og1)" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M28,38 C68,58 110,22 158,48 C198,28 248,54 282,32" stroke="url(#og2)" stroke-width="7.5" fill="none" stroke-linecap="round"/>
+  <path d="M14,44 C54,28 94,54 144,38 C184,24 228,50 284,30" stroke="#C07828" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+  <path d="M22,34 C62,50 104,28 150,46 C192,62 240,30 280,50" stroke="url(#og1)" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M38,56 C76,38 118,58 164,42 C204,27 248,50 278,36" stroke="url(#og2)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+</svg>

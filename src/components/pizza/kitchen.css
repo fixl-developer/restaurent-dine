@@ -53,6 +53,21 @@
 .burger-piece.piece-tomato {
   width: 67%;
 }
+.burger-piece.piece-sauce {
+  width: 72%;
+}
+.burger-piece.piece-bacon {
+  width: 76%;
+}
+.burger-piece.piece-pickle {
+  width: 70%;
+}
+.burger-piece.piece-onion {
+  width: 74%;
+}
+.burger-piece.piece-jalapeno {
+  width: 68%;
+}
 .taco-plate {
   position: absolute;
   inset: 6%;
@@ -91,6 +106,23 @@
   width: 51%;
   top: 58%;
   left: 47%;
+}
+.taco-piece.piece-corn {
+  width: 40%;
+  top: 42%;
+  left: 40%;
+}
+.taco-piece.piece-sour-cream {
+  width: 36%;
+  top: 54%;
+  left: 61%;
+  rotate: 10deg;
+}
+.taco-piece.piece-jalapeno {
+  width: 36%;
+  top: 66%;
+  left: 46%;
+  rotate: -8deg;
 }
 .kitchen-inspect {
   display: inline-flex;

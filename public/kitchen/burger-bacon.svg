@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 90">
+  <defs>
+    <linearGradient id="b1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7B1E0E"/>
+      <stop offset="35%" stop-color="#B83020"/>
+      <stop offset="65%" stop-color="#7B1E0E"/>
+      <stop offset="100%" stop-color="#A02818"/>
+    </linearGradient>
+    <linearGradient id="b2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B03020"/>
+      <stop offset="40%" stop-color="#7B1E0E"/>
+      <stop offset="75%" stop-color="#B03020"/>
+      <stop offset="100%" stop-color="#7B1E0E"/>
+    </linearGradient>
+  </defs>
+  <path d="M18,22 C52,13 72,32 105,22 C135,13 158,32 190,22 C218,13 240,32 278,22 L278,42 C240,52 218,33 190,42 C158,52 135,33 105,42 C72,52 52,33 18,42 Z" fill="url(#b1)"/>
+  <circle cx="80" cy="30" r="4.5" fill="#E8A06A" opacity="0.7"/>
+  <circle cx="152" cy="26" r="4" fill="#D4885A" opacity="0.65"/>
+  <circle cx="228" cy="31" r="4.5" fill="#E8A06A" opacity="0.7"/>
+  <path d="M18,52 C52,42 73,62 106,52 C136,42 158,62 192,52 C220,42 242,62 278,52 L278,72 C242,82 220,63 192,72 C158,82 136,63 106,72 C73,82 52,63 18,72 Z" fill="url(#b2)"/>
+  <circle cx="65" cy="60" r="4" fill="#E8A06A" opacity="0.65"/>
+  <circle cx="142" cy="58" r="4.5" fill="#D4885A" opacity="0.7"/>
+  <circle cx="218" cy="62" r="4" fill="#E8A06A" opacity="0.65"/>
+</svg>

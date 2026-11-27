@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 72">
+  <defs>
+    <radialGradient id="pg1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8CC880"/>
+      <stop offset="100%" stop-color="#3D7A38"/>
+    </radialGradient>
+    <radialGradient id="pg2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7DC070"/>
+      <stop offset="100%" stop-color="#356E30"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="62" cy="36" rx="50" ry="23" fill="url(#pg1)" stroke="#2A5C26" stroke-width="1.5"/>
+  <ellipse cx="62" cy="36" rx="36" ry="15" fill="none" stroke="#5A9655" stroke-width="1" opacity="0.55"/>
+  <circle cx="52" cy="29" r="3" fill="#B0E8A8" opacity="0.7"/>
+  <circle cx="72" cy="43" r="2.5" fill="#B0E8A8" opacity="0.6"/>
+  <ellipse cx="118" cy="36" rx="50" ry="23" fill="url(#pg2)" stroke="#2A5C26" stroke-width="1.5"/>
+  <ellipse cx="118" cy="36" rx="36" ry="15" fill="none" stroke="#5A9655" stroke-width="1" opacity="0.55"/>
+  <circle cx="108" cy="30" r="3" fill="#B0E8A8" opacity="0.65"/>
+  <circle cx="128" cy="43" r="2.5" fill="#B0E8A8" opacity="0.6"/>
+  <ellipse cx="178" cy="36" rx="50" ry="23" fill="url(#pg1)" stroke="#2A5C26" stroke-width="1.5"/>
+  <ellipse cx="178" cy="36" rx="36" ry="15" fill="none" stroke="#5A9655" stroke-width="1" opacity="0.55"/>
+  <circle cx="168" cy="30" r="3" fill="#B0E8A8" opacity="0.7"/>
+  <circle cx="188" cy="43" r="2.5" fill="#B0E8A8" opacity="0.6"/>
+  <ellipse cx="238" cy="36" rx="50" ry="23" fill="url(#pg2)" stroke="#2A5C26" stroke-width="1.5"/>
+  <ellipse cx="238" cy="36" rx="36" ry="15" fill="none" stroke="#5A9655" stroke-width="1" opacity="0.55"/>
+  <circle cx="228" cy="30" r="3" fill="#B0E8A8" opacity="0.65"/>
+  <circle cx="248" cy="43" r="2.5" fill="#B0E8A8" opacity="0.6"/>
+</svg>

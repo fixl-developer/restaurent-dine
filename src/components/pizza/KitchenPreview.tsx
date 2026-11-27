@@ -4,25 +4,59 @@ import type { IngredientArt } from "./ingredients";
 import "./kitchen.css";
 
 type KitchenKind = "burger" | "taco";
+
 const burgerOrder = [
   "bottom",
   "patty",
+  "sauce",
   "cheddar",
+  "bacon",
+  "pickle",
+  "onion",
+  "jalapeno",
   "tomato",
   "lettuce",
   "top",
 ] as const;
-const tacoOrder = ["tortilla", "beans", "salsa", "avocado", "cheddar"] as const;
+
+const tacoOrder = [
+  "tortilla",
+  "beans",
+  "corn",
+  "salsa",
+  "avocado",
+  "sour-cream",
+  "cheddar",
+  "jalapeno",
+] as const;
 
 // Vertical separation between each ingredient's contact surface, as a percentage of the stage.
-const burgerRise = {
+const burgerRise: Record<(typeof burgerOrder)[number], number> = {
   bottom: 8,
   patty: 8,
+  sauce: 1,
   cheddar: 2,
+  bacon: 3,
+  pickle: 1,
+  onion: 2,
+  jalapeno: 1,
   tomato: 3,
   lettuce: 4,
   top: 0,
 };
+
+const svgParts = new Set([
+  "sauce",
+  "bacon",
+  "pickle",
+  "onion",
+  "jalapeno",
+  "corn",
+  "sour-cream",
+]);
+function partExt(part: string) {
+  return svgParts.has(part) ? "svg" : "webp";
+}
 
 export default function KitchenPreview({
   kind,
@@ -50,7 +84,7 @@ export default function KitchenPreview({
     burger.reduce((sum, part) => sum + burgerRise[part], 0) +
     separation * (burger.length - 1);
   // The top bun occupies 46% of the stage at its natural aspect ratio.
-  // Fit the complete silhouette, even when all three optional layers are lifted.
+  // Fit the complete silhouette, even when all optional layers are lifted.
   const stackScale = Math.min(1, 92 / (height + 46));
   let offset = (100 - height - 46) / 2;
   return (
@@ -73,7 +107,7 @@ export default function KitchenPreview({
                 key={part}
                 className={"burger-piece piece-" + part}
                 style={{ bottom: bottom + "%" }}
-                src={"/kitchen/burger-" + part + ".webp"}
+                src={"/kitchen/burger-" + part + "." + partExt(part)}
                 alt=""
                 draggable={false}
               />
@@ -88,7 +122,7 @@ export default function KitchenPreview({
               <img
                 key={part}
                 className={"taco-piece piece-" + part}
-                src={"/kitchen/taco-" + part + ".webp"}
+                src={"/kitchen/taco-" + part + "." + partExt(part)}
                 alt=""
                 draggable={false}
               />
