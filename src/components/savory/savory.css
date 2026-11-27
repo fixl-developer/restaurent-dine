@@ -61,6 +61,13 @@
 .savory-lift{transform:translate3d(calc(var(--lift)*-4%),var(--stick-y),0) rotate(var(--tilt)) scale(calc(.95 + (var(--camera) - 1)*.54));transform-origin:36% 43%}
 .savory-strands-near{clip-path:inset(45% 68% 0 0);transform:skewX(var(--sway)) scaleY(var(--length))}
 .savory-strands-far{clip-path:inset(45% 0 0 31.9%);transform:skewX(calc(var(--sway)*.35)) scaleY(calc(.34 + var(--length)*.66))}
+/* Smooth out scroll-driven position jumps between render cycles */
+@media(prefers-reduced-motion:no-preference){
+  .savory-lift{transition:transform .12s ease-out}
+  .savory-strands-near,.savory-strands-far{transition:transform .08s ease-out,clip-path .08s ease-out}
+  .savory-camera{transition:transform .18s ease-out}
+  .savory-steam i{transition:opacity .15s ease-out,transform .15s ease-out}
+}
 .savory-steam{position:absolute;left:38%;bottom:37%;width:28%;height:29%;pointer-events:none}
 .savory-steam i{--p:var(--steam-phase);position:absolute;inset:0 42% 0 0;border-left:4px solid #fff5d9;border-radius:50%;filter:blur(2px);opacity:calc(.38 - var(--p)*.37);transform:translateY(calc(var(--p)*-67%)) rotate(calc(-11deg + var(--p)*25deg))}
 .savory-steam i+i{--p:var(--steam-late);left:42%;right:8%}

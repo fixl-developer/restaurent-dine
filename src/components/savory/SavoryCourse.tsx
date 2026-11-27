@@ -38,6 +38,9 @@ export default function SavoryCourse() {
     distance: number;
     moved: boolean;
   } | null>(null);
+  const targetT = useRef(0);
+  const displayT = useRef(0);
+  const lerpId = useRef(0);
   const [dragging, setDragging] = useState(false);
   const { data } = usePublicMenu({ channel: "window" });
   const noodles = data?.categories
@@ -51,6 +54,11 @@ export default function SavoryCourse() {
   const pose = poseAt(time);
 
   function seek(value: number) {
+    // Cancel any in-progress lerp so seek lands immediately
+    cancelAnimationFrame(lerpId.current);
+    lerpId.current = 0;
+    targetT.current = value;
+    displayT.current = value;
     const track = section.current;
     const frame = stage.current;
     if (track && frame && getComputedStyle(frame).position === "sticky") {
@@ -106,16 +114,26 @@ export default function SavoryCourse() {
         return;
       const travel = node.offsetHeight - frame.offsetHeight;
       if (travel > 0)
-        setTime(
+        targetT.current =
           duration *
-            Math.max(
-              0,
-              Math.min(1, -node.getBoundingClientRect().top / travel),
-            ),
-        );
+          Math.max(0, Math.min(1, -node.getBoundingClientRect().top / travel));
+    }
+    function smoothStep() {
+      lerpId.current = 0;
+      const diff = targetT.current - displayT.current;
+      if (Math.abs(diff) < 0.005) {
+        displayT.current = targetT.current;
+        setTime(targetT.current);
+        return;
+      }
+      displayT.current += diff * 0.14;
+      setTime(displayT.current);
+      lerpId.current = requestAnimationFrame(smoothStep);
     }
     function schedule() {
       if (visible && !scheduled) scheduled = requestAnimationFrame(update);
+      if (visible && !lerpId.current)
+        lerpId.current = requestAnimationFrame(smoothStep);
     }
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
@@ -133,6 +151,7 @@ export default function SavoryCourse() {
     motion.addEventListener("change", changed);
     return () => {
       cancelAnimationFrame(scheduled);
+      cancelAnimationFrame(lerpId.current);
       observer.disconnect();
       motion.removeEventListener("change", changed);
       window.removeEventListener("resize", schedule);
