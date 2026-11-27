@@ -158,6 +158,7 @@ export interface KdsItemDto {
 }
 
 export interface KdsOrderDto {
+  qrService?:boolean;
   id: string;
   orderNumber: string;
   deliveryId?: string;

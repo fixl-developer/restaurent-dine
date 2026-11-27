@@ -302,7 +302,7 @@ export default function LoginPage() {
               </button>
             </form>
           )}
-          {!mfa && import.meta.env.DEV && (
+          {!mfa && (import.meta.env.DEV || import.meta.env.VITE_DEMO_LOGINS === "true") && (
             <div className="mt-6 rounded-xl border border-dashed border-[#e0b3c2] bg-[#fdf3f6] p-3">
               <p className="text-[11px] font-semibold text-[var(--promise-berry)] mb-2">
                 Demo accounts (dev only) — click to sign in as a role

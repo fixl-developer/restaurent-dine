@@ -146,6 +146,7 @@ export function useMoveTableSession() {
 export function useOpenTableSessions() {
   return useQuery({
     queryKey: [...SESSIONS_KEY, 'open'],
+    refetchInterval: 15000,
     queryFn: () => api.get<TableSessionDto[]>('/table-sessions/open'),
     staleTime: 15_000,
   });

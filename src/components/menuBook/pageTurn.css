@@ -1,0 +1,70 @@
+.book-leaf {
+  position: absolute; inset: 0 0 0 50%; z-index: 3; pointer-events: none;
+  transform-style: preserve-3d; transform-origin: left center;
+  animation: book-turn 760ms cubic-bezier(.42,.06,.26,.96) both;
+}
+.book-backward { animation-direction: reverse; }
+.book-face {
+  position: absolute; inset: 0; background: #f6ecd8; backface-visibility: hidden;
+  overflow: hidden; border-radius: 1px 5px 5px 1px;
+}
+.book-face > div { height: 100%; }
+.book-verso { transform: rotateY(180deg); border-radius: 5px 1px 1px 5px; }
+.book-face::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, #492e1c66, transparent 68%, #fff7df66);
+  animation: book-shade 760ms ease-in-out both;
+}
+@keyframes book-turn {
+  from { transform: translateZ(2px) rotateY(0deg); }
+  to { transform: translateZ(2px) rotateY(-180deg); }
+}
+@keyframes book-shade { 0%,100% { opacity: 0; } 48% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .book-leaf { display: none; } }
+
+/* The fingertip follows the outside edge of the sheet as it crosses the spine. */
+.book-hands {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.book-hands i {
+  display: block;
+  position: absolute;
+  width: clamp(6rem, 29%, 16rem);
+  aspect-ratio: 440 / 365;
+  background: url("/kitchen/page-hand.webp") center / contain no-repeat;
+  transform-origin: 3% 10%;
+  filter: drop-shadow(1px 3px 2px #39261b50);
+}
+.book-grip-point { position: absolute; top: 77%; right: 2%; width: 1px; height: 1px; pointer-events: none; }
+.book-moving-hand {
+  left: var(--grip-x, 98%);
+  top: var(--grip-y, 77%);
+  translate: -3% -10%;
+}
+.book-hands .book-anchor-hand {
+  transform-origin: center;
+  right: 93%;
+  top: 85%;
+  scale: -1 1;
+
+}
+.book-hands[data-forward="false"] .book-moving-hand { scale: -1 1; }
+.book-hands[data-forward="false"] .book-anchor-hand { left: 93%; right: auto; scale: 1; }
+.book-draggable { touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
+.book-draggable img { -webkit-user-drag: none; }
+.book-draggable[data-scrubbing=true] { cursor: grabbing; }
+.book-draggable[data-scrubbing=true] .book-leaf { animation: none; transform: translateZ(2px) rotateY(var(--sheet-angle)); }
+.book-draggable[data-scrubbing=true] .mb-mobile-sheet { animation: none; transform: perspective(1100px) rotateY(var(--mobile-angle)); }
+.book-draggable[data-scrubbing=true] .book-face::after { animation: none; opacity: .2; }
+.book-hands[data-turning=false] .book-moving-hand { left: 91%; top: 81%; transform: rotate(15deg); }
+.book-hands[data-turning=true] .book-moving-hand { transform: rotate(20deg); }
+@media (prefers-reduced-motion: reduce) {
+  .book-hands { display: block; }
+  .book-hands[data-turning=true] .book-moving-hand { left: 91%; top: 81%; }
+  .book-draggable[data-scrubbing=true] :is(.book-leaf, .mb-mobile-sheet, .mb-mobile-base) { display: none; }
+}

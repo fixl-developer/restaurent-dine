@@ -1,3 +1,4 @@
+import type { PizzaBuilderConfig, IngredientArt } from "@/components/pizza/ingredients";
 /** Guest-facing (public) DTOs. */
 
 import type {
@@ -17,6 +18,7 @@ export interface PublicVariant {
 }
 
 export interface PublicModifier {
+  pizzaArt?: IngredientArt | null;
   id: string;
   name: string;
   priceDelta: number;
@@ -33,6 +35,7 @@ export interface PublicModifierGroup {
 }
 
 export interface PublicMenuItem {
+  pizzaBuilder?: PizzaBuilderConfig | null;
   id: string;
   slug: string;
   name: string;
@@ -45,6 +48,9 @@ export interface PublicMenuItem {
   allergens: string[];
   tags: string[];
   imageUrl?: string;
+  /** Optional transparent artwork and a self-contained glTF binary for menu inspection. */
+  cutoutUrl?: string;
+  modelUrl?: string;
   prepTimeMinutes: number;
   variants: PublicVariant[];
   modifierGroups: PublicModifierGroup[];
@@ -137,6 +143,7 @@ export interface PlaceWindowInput {
 
 // ── Guest order response (toGuestDTO from backend) ─────────────────────────
 export interface GuestOrderDto {
+  qrService?:boolean;
   fulfillment?: "dine_in" | "pickup" | "delivery";
   currency?: string;
   pickupAt?: string;

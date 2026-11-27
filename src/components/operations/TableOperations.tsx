@@ -1,3 +1,5 @@
+import RunnerPass from "@/components/tableService/RunnerPass";
+import { FloorInbox, ShiftCoverage, StaffVisit } from "@/components/tableService/StaffVisits";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -79,6 +81,7 @@ export default function TableOperations({ onExit }: { onExit: () => void }) {
     Object.fromEntries(
       [
         "table:updated",
+        "table:service_changed",
         "table:status_changed",
         "table:merged",
         "table:split",
@@ -95,6 +98,7 @@ export default function TableOperations({ onExit }: { onExit: () => void }) {
           s.tableId,
           {
             guestCount: s.guestCount,
+            serverName: s.waiterName,
             runningTotal: s.runningTotal,
             currency: s.currency,
             seatedMins: Math.floor(
@@ -219,6 +223,9 @@ export default function TableOperations({ onExit }: { onExit: () => void }) {
           </div>
         ))}
       </div>
+      <FloorInbox tables={tables} onSelect={(id,covers)=>{select(id);if(covers)setGuestCount(covers)}}/>
+      <RunnerPass/>
+      <Can perm="user:update"><ShiftCoverage/></Can>
       <div className="table-service-layout">
         <section className="service-floor">
           <div className="flex justify-between flex-wrap gap-3 mb-4">
@@ -301,6 +308,7 @@ export default function TableOperations({ onExit }: { onExit: () => void }) {
                   }[selected.status]
                 }
               />
+              {visit?.qrService && <StaffVisit key={visit._id} visit={visit}/>}
               {visit && (
                 <div className="table-visit-summary">
                   <p>

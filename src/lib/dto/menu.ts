@@ -1,3 +1,4 @@
+import type { PizzaBuilderConfig, IngredientArt } from "@/components/pizza/ingredients";
 /** Menu DTOs mirroring the backend Category / Item / ModifierGroup / Combo. */
 
 export type FoodType = 'veg' | 'non_veg' | 'egg' | 'vegan';
@@ -31,6 +32,7 @@ export interface AvailabilityWindow {
 }
 
 export interface ItemDto {
+  pizzaBuilder?: PizzaBuilderConfig | null;
   _id: string;
   name: string;
   slug: string;
@@ -59,6 +61,7 @@ export interface ItemDto {
 }
 
 export interface ModifierDto {
+  pizzaArt?: IngredientArt | null;
   _id: string;
   name: string;
   priceDelta: number;
@@ -103,6 +106,7 @@ export type CreateCategoryInput = {
 };
 
 export type CreateItemInput = {
+  pizzaBuilder?: PizzaBuilderConfig | null;
   name: string;
   slug?: string;
   description?: string;

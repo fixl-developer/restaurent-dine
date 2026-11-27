@@ -1,3 +1,7 @@
+import { recipeSelection } from "@/components/pizza/recipeSelection";
+import PizzaBuilder from "@/components/pizza/PizzaBuilder";
+import { builderKind, builderPhoto } from "@/components/pizza/ingredients";
+import GuestVisit, { type VisitAccess } from "@/components/tableService/GuestVisit";
 import { useMutation } from "@tanstack/react-query";
 import { useCheckoutDraft } from "@/hooks/useCheckoutDraft";
 import { submitCheckout } from "@/lib/checkoutDraft";
@@ -69,6 +73,15 @@ const FOOD_TYPE_BADGE: Record<string, { color: string; label: string }> = {
 
 export default function GuestOrderPage() {
   const [params] = useSearchParams();
+  const qr = params.get("qr");
+  if (!qr) return <GuestMenu access={{allowed:false}} />;
+  return <GuestVisit key={qr} qr={qr}>{access =>
+    <GuestMenu key={access.scope ?? qr} access={access} />
+  }</GuestVisit>;
+}
+
+function GuestMenu({access}:{access:VisitAccess}) {
+  const [params] = useSearchParams();
   const navigate = useNavigate();
   const qrSlug = params.get("qr") ?? undefined;
   const tableId = params.get("table") ?? undefined;
@@ -76,7 +89,7 @@ export default function GuestOrderPage() {
 
   const menuQuery = usePublicMenu({ channel: "dine_in" });
   const [lastOrderId, setLastOrderIdState] = useState<string | null>(() =>
-    getLastOrderId(tableId, qrSlug),
+    access.allowed ? getLastOrderId(access.scope ?? tableId, qrSlug) : null,
   );
   const lastOrderQuery = useGuestOrder(lastOrderId);
   const lastOrder =
@@ -87,7 +100,7 @@ export default function GuestOrderPage() {
 
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const draftScope = `table:${qrSlug ?? "unknown"}`;
+  const draftScope = access.scope ?? `table:${qrSlug ?? "unknown"}`;
   const { draft, field } = useCheckoutDraft(draftScope);
   const { cart, guestName, guestPhone, guestNotes } = draft;
   const setCart = field("cart"),
@@ -124,7 +137,12 @@ export default function GuestOrderPage() {
   }, [menu, search, activeCategory]);
 
   function addSimpleItem(item: PublicMenuItem) {
-    if (item.modifierGroups.length > 0 || item.variants.length > 0) {
+    if (!access.allowed) {
+      toast.info("Join your table before adding dishes");
+      document.querySelector<HTMLElement>('[aria-label="Table service"]')?.scrollIntoView({block:"center"});
+      return;
+    }
+    if (item.pizzaBuilder?.enabled || item.modifierGroups.length > 0 || item.variants.length > 0) {
       setCustomizingItem(item);
       return;
     }
@@ -186,7 +204,8 @@ export default function GuestOrderPage() {
         path: adding
           ? `/guest/orders/${lastOrder.id}/items`
           : "/guest/orders/dine-in",
-        principal: `table:${qrSlug}`,
+        principal: access.scope ?? `table:${qrSlug}`,
+        visitToken: access.token,
         noAuth: true,
         body: {
           ...(adding
@@ -214,13 +233,14 @@ export default function GuestOrderPage() {
     },
     onSuccess: (order) => {
       toast.success(`Order ${order.orderNumber} confirmed!`);
-      setLastOrderId(tableId, qrSlug, order.id);
+      setLastOrderId(access.scope ?? tableId, qrSlug, order.id);
       setLastOrderIdState(order.id);
       navigate(`/track/${order.id}`);
     },
     onError: (error: Error) => toast.error(error.message),
   });
   function handlePlaceOrder() {
+    if (!access.allowed) {toast.error("Join your table before ordering");return;}
     if (placeOrder.isPending) return;
     if (
       !draft.pending &&
@@ -289,6 +309,7 @@ export default function GuestOrderPage() {
   return (
     <div className="min-h-screen bg-[#fff8ef] pb-24">
       <GuestHeader />
+      {access.panel}
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
@@ -587,9 +608,9 @@ function MenuItemCard({
         </div>
       </div>
       <div className="shrink-0">
-        {item.imageUrl ? (
+        {item.imageUrl || item.pizzaBuilder?.enabled ? (
           <img
-            src={item.imageUrl}
+            src={item.imageUrl || (item.pizzaBuilder ? builderPhoto(item.pizzaBuilder) : undefined)}
             alt={item.name}
             className="w-20 h-20 rounded-xl object-cover mb-2"
           />
@@ -603,15 +624,15 @@ function MenuItemCard({
             onClick={onAdd}
             className="w-20 py-1.5 bg-[var(--promise-berry)] text-white rounded-lg text-xs font-bold"
           >
-            {cartQty} ADDED
+            {item.pizzaBuilder?.enabled ? "Build another" : cartQty + " ADDED"}
           </button>
         ) : (
           <button
             onClick={onAdd}
             className="w-20 py-1.5 border border-brand-500 text-brand-600 rounded-lg text-xs font-bold hover:bg-brand-50 transition-colors flex items-center justify-center gap-1"
           >
-            <Plus className="w-3 h-3" /> ADD
-            {hasOptions && <span className="text-[8px] ml-0.5">+</span>}
+            {item.pizzaBuilder?.enabled ? "Build your " + builderKind(item.pizzaBuilder) : <><Plus className="w-3 h-3" /> ADD</>}
+            {hasOptions && !item.pizzaBuilder?.enabled && <span className="text-[8px] ml-0.5">+</span>}
           </button>
         )}
       </div>
@@ -623,18 +644,18 @@ function MenuItemCard({
 export function CustomizeModal({
   fmt,
   item,
+  initialToppings,
   onClose,
   onAdd,
 }: {
+  initialToppings?: string[];
   fmt: (amount: number) => string;
   item: PublicMenuItem;
   onClose: () => void;
   onAdd: (line: GuestCartLine) => void;
 }) {
   const [variantId, setVariantId] = useState(item.variants[0]?.id);
-  const [selectedMods, setSelectedMods] = useState<Record<string, string[]>>(
-    {},
-  );
+  const [selectedMods, setSelectedMods] = useState<Record<string, string[]>>(() => recipeSelection(item.modifierGroups, initialToppings));
   const [notes, setNotes] = useState("");
 
   function toggleMod(group: PublicModifierGroup, modifierId: string) {
@@ -710,6 +731,10 @@ export function CustomizeModal({
     });
   }
 
+  if (item.pizzaBuilder?.enabled) return <PizzaBuilder item={item} variantId={variantId} setVariantId={setVariantId}
+    selected={selectedMods} toggle={toggleMod} notes={notes} setNotes={setNotes} total={lineTotal} fmt={fmt}
+    missing={missingRequired} onClose={onClose} onAdd={submit}/>;
+
   return (
     <Dialog
       onClose={onClose}
@@ -726,6 +751,7 @@ export function CustomizeModal({
         </div>
 
         <div className="px-5 py-4 space-y-5">
+          {item.description && <p className="text-sm text-gray-700">{item.description}</p>}
           {item.variants.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-gray-700 mb-2">
