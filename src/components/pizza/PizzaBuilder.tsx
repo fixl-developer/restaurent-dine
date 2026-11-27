@@ -44,6 +44,19 @@ export default function PizzaBuilder({
     g.modifiers.filter((m) => selected[g.id]?.includes(m.id)),
   );
   const variantIndex = item.variants.findIndex((v) => v.id === variantId);
+  const variantName = item.variants[variantIndex]?.name.trim() ?? "";
+  // A patty-count variant changes the stack. Other variants retain the menu's portion sizing.
+  const stack =
+    /^(single|double|triple|[123]\s*[x×])(?:[ -]+(?:patty|patties|burger|stack))*$/i.exec(
+      variantName,
+    ) ?? /^([123])[ -]*(?:patty|patties)(?:[ -]+burger)?$/i.exec(variantName);
+  const countLabel = stack?.[1].toLowerCase();
+  const patties =
+    countLabel === "double" || countLabel?.startsWith("2")
+      ? 2
+      : countLabel === "triple" || countLabel?.startsWith("3")
+        ? 3
+        : 1;
   const scale =
     item.variants.length > 1
       ? 0.87 + (0.13 * Math.max(0, variantIndex)) / (item.variants.length - 1)
@@ -87,7 +100,12 @@ export default function PizzaBuilder({
                 scale={scale}
               />
             ) : (
-              <KitchenPreview kind={kind} choices={choices} scale={scale} />
+              <KitchenPreview
+                kind={kind}
+                choices={choices}
+                scale={kind === "burger" && stack ? 1 : scale}
+                patties={patties}
+              />
             )}
           </div>
           <div className="pizza-options">

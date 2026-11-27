@@ -21,3 +21,53 @@
 }
 @keyframes book-shade { 0%,100% { opacity: 0; } 48% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .book-leaf { display: none; } }
+
+/* The fingertip follows the outside edge of the sheet as it crosses the spine. */
+.book-hands {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.book-hands i {
+  display: block;
+  position: absolute;
+  width: clamp(6rem, 29%, 16rem);
+  aspect-ratio: 440 / 365;
+  background: url("/kitchen/page-hand.webp") center / contain no-repeat;
+  transform-origin: 3% 10%;
+  filter: drop-shadow(1px 3px 2px #39261b50);
+}
+.book-grip-point { position: absolute; top: 77%; right: 2%; width: 1px; height: 1px; pointer-events: none; }
+.book-moving-hand {
+  left: var(--grip-x, 98%);
+  top: var(--grip-y, 77%);
+  translate: -3% -10%;
+  animation: book-fingers 760ms cubic-bezier(.42,.06,.26,.96) both;
+}
+.book-hands .book-anchor-hand {
+  transform-origin: center;
+  right: 93%;
+  top: 85%;
+  scale: -1 1;
+
+  animation: book-steady 760ms ease-in-out both;
+}
+.book-hands[data-forward="false"] .book-moving-hand { scale: -1 1; }
+.book-hands[data-forward="false"] .book-anchor-hand { left: 93%; right: auto; scale: 1; }
+@keyframes book-fingers {
+  0% { opacity: 0; transform: rotate(18deg); }
+  14% { opacity: 1; transform: rotate(12deg); }
+  48% { opacity: 1; transform: rotate(24deg); }
+  83% { opacity: 1; transform: rotate(42deg); }
+  100% { opacity: 0; transform: rotate(53deg); }
+}
+@keyframes book-steady {
+  0%, 100% { opacity: 0; transform: translateY(16%); }
+  18%, 80% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-hands { display: none; }
+}

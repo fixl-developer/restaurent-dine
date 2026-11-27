@@ -106,6 +106,7 @@ export default function MenuBook({ collection, items, categories, formatPrice, q
             front={details(turn.forward ? turn.from : current, true)}
             back={<DishArtwork item={turn.forward ? current : turn.from} />} />}
           {turn && <div key={'mobile-' + turn.to.id} className={'mb-mobile-sheet ' + (turn.forward ? 'mb-out' : 'mb-in')} aria-hidden="true" inert>
+            <i className="book-grip-point" />
             <DishArtwork item={turn.forward ? turn.from : current} />
             {details(turn.forward ? turn.from : current, true)}
           </div>}

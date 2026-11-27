@@ -62,20 +62,29 @@ export default function KitchenPreview({
   kind,
   choices,
   scale,
+  patties = 1,
 }: {
   kind: KitchenKind;
   choices: { pizzaArt?: IngredientArt | null }[];
   scale: number;
+  patties?: number;
 }) {
   const [open, setOpen] = useState(false);
   const [turns, setTurns] = useState(0);
   const selected = new Set<string>(
     choices.flatMap((m) => (m.pizzaArt ? [m.pizzaArt] : [])),
   );
-  const burger = burgerOrder.filter(
-    (art) =>
-      art === "bottom" || art === "patty" || art === "top" || selected.has(art),
-  );
+  const burger = burgerOrder
+    .filter(
+      (art) =>
+        art === "bottom" ||
+        art === "patty" ||
+        art === "top" ||
+        selected.has(art),
+    )
+    .flatMap((part) =>
+      part === "patty" ? Array.from({ length: patties }, () => part) : [part],
+    );
   const taco = tacoOrder.filter(
     (art) => art === "tortilla" || art === "beans" || selected.has(art),
   );
@@ -86,55 +95,70 @@ export default function KitchenPreview({
   // The top bun occupies 46% of the stage at its natural aspect ratio.
   // Fit the complete silhouette, even when all optional layers are lifted.
   const stackScale = Math.min(1, 92 / (height + 46));
-  let offset = (100 - height - 46) / 2;
+  let offset = 0;
+  let pattyIndex = 0;
   return (
     <div className={"kitchen-preview kitchen-" + kind}>
-      <div
-        className="kitchen-food"
-        style={
-          {
-            "--portion": kind === "burger" ? scale * stackScale : scale,
-          } as CSSProperties
-        }
-        aria-hidden="true"
-      >
-        {kind === "burger" ? (
-          burger.map((part) => {
-            const bottom = offset;
-            offset += burgerRise[part] + separation;
-            return (
-              <img
-                key={part}
-                className={"burger-piece piece-" + part}
-                style={{ bottom: bottom + "%" }}
-                src={"/kitchen/burger-" + part + "." + partExt(part)}
-                alt=""
-                draggable={false}
-              />
-            );
-          })
-        ) : (
-          <div
-            className="taco-plate"
-            style={{ transform: "rotate(" + (turns * 45 - 12) + "deg)" }}
-          >
-            {taco.map((part) => (
-              <img
-                key={part}
-                className={"taco-piece piece-" + part}
-                src={"/kitchen/taco-" + part + "." + partExt(part)}
-                alt=""
-                draggable={false}
-              />
-            ))}
-          </div>
+      <div className={kind === "burger" ? "burger-setting" : "taco-setting"}>
+        {kind === "burger" && (
+          <div className="burger-contact" aria-hidden="true" />
         )}
+        <div
+          className="kitchen-food"
+          style={
+            {
+              "--portion": kind === "burger" ? scale * stackScale : scale,
+            } as CSSProperties
+          }
+          aria-hidden="true"
+        >
+          {kind === "burger" ? (
+            burger.map((part) => {
+              const bottom = offset;
+              offset += burgerRise[part] + separation;
+              const copy = part === "patty" ? pattyIndex++ : 0;
+              return (
+                <img
+                  key={part + copy}
+                  data-layer={part}
+                  data-reversed={copy % 2 === 1}
+                  className={"burger-piece piece-" + part}
+                  style={{ bottom: bottom + "%" }}
+                  src={"/kitchen/burger-" + part + "." + partExt(part)}
+                  alt=""
+                  draggable={false}
+                />
+              );
+            })
+          ) : (
+            <div
+              className="taco-plate"
+              style={{ transform: "rotate(" + (turns * 45 - 12) + "deg)" }}
+            >
+              {taco.map((part) => (
+                <img
+                  key={part}
+                  className={"taco-piece piece-" + part}
+                  src={"/kitchen/taco-" + part + "." + partExt(part)}
+                  alt=""
+                  draggable={false}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       {kind === "burger" ? (
         <button
           type="button"
           className="kitchen-inspect"
           aria-pressed={open}
+          aria-label={
+            (open ? "Close the stack" : "Lift the layers") +
+            ", " +
+            patties +
+            (patties === 1 ? " patty" : " patties")
+          }
           onClick={() => setOpen(!open)}
         >
           <Layers size={15} />
