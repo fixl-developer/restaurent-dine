@@ -159,7 +159,7 @@
     transform 0.22s ease-out,
     top 0.85s ease-in-out;
 }
-.pw[data-stage="boxed"] .pw-box {
+.pw-slide[data-stage="boxed"] .pw-box {
   top: 3%;
 }
 .pw-box::before {
@@ -223,6 +223,40 @@
     0 94%
   );
 }
+.pw-folds {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(calc(var(--wall) * 0.65));
+  pointer-events: none;
+}
+.pw-folds i {
+  position: absolute;
+  width: 8%;
+  aspect-ratio: 1;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  background:
+    var(--kraft-grain),
+    linear-gradient(135deg, #e2bf93 38%, #ae855a 48%, #eaceaa 53%, #bd956d 68%);
+}
+.pw-folds i:nth-child(1) {
+  top: 0;
+  left: 0;
+}
+.pw-folds i:nth-child(2) {
+  top: 0;
+  right: 0;
+  transform: rotate(90deg);
+}
+.pw-folds i:nth-child(3) {
+  bottom: 0;
+  right: 0;
+  transform: rotate(180deg);
+}
+.pw-folds i:nth-child(4) {
+  bottom: 0;
+  left: 0;
+  transform: rotate(270deg);
+}
 .pw-food {
   inset: 4.5%;
   transform: translateZ(8px);
@@ -233,9 +267,9 @@
   width: 100%;
   height: 100%;
 }
-.pw[data-stage="baking"] .pw-food,
-.pw[data-stage="baked"] .pw-food,
-.pw[data-stage="boxed"] .pw-food {
+.pw-slide[data-stage="baking"] .pw-food,
+.pw-slide[data-stage="baked"] .pw-food,
+.pw-slide[data-stage="boxed"] .pw-food {
   filter: sepia(0.23) saturate(1.28) brightness(0.9) contrast(1.12)
     drop-shadow(2px 4px 4px #59291777);
 }
@@ -372,7 +406,7 @@
   border: 2px solid #b58963;
   transform: translateZ(2px);
 }
-.pw[data-stage="boxed"] .pw-lid {
+.pw-slide[data-stage="boxed"] .pw-lid {
   transform: translateZ(var(--wall)) rotateX(0deg);
 }
 .pw-heat {
@@ -391,13 +425,13 @@
   border-radius: 60%;
   filter: blur(2px);
 }
-.pw[data-stage="baking"] .pw-heat i {
+.pw-slide[data-stage="baking"] .pw-heat i {
   animation: pw-steam 0.8s ease-out infinite;
 }
-.pw[data-stage="baking"] .pw-heat i:nth-child(2) {
+.pw-slide[data-stage="baking"] .pw-heat i:nth-child(2) {
   animation-delay: 0.19s;
 }
-.pw[data-stage="baking"] .pw-heat i:nth-child(3) {
+.pw-slide[data-stage="baking"] .pw-heat i:nth-child(3) {
   animation-delay: 0.36s;
 }
 @keyframes pw-steam {
@@ -480,10 +514,255 @@
   .pw-food {
     transition: none;
   }
-  .pw[data-stage="baking"] .pw-heat i {
+  .pw-slide[data-stage="baking"] .pw-heat i {
     animation: none;
   }
   .pw .pizza-layer img {
     animation: none;
+  }
+}
+
+.pw-switch {
+  display: flex;
+  gap: 0.2rem;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  max-width: 96%;
+  margin: clamp(1.3rem, 3vw, 2.5rem) auto 0;
+  padding: 0.22rem;
+  border: 1px solid #ad807350;
+  background: #fff8eb;
+  border-radius: 3rem;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 3px 10px #6243320d;
+}
+.pw-switch button {
+  border-radius: 2rem;
+  min-height: 42px;
+  padding: 0 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: #653d38;
+  display: grid;
+  place-items: center;
+}
+.pw-switch button[aria-pressed="true"] {
+  background: #6a2932;
+  color: #fff8ec;
+}
+.pw-switch button:first-child,
+.pw-switch button:last-child {
+  padding: 0 0.65rem;
+}
+.pw-slide[hidden] {
+  display: none;
+}
+.pw[data-kind="burger"] {
+  background-color: #ebcfac;
+}
+.pw[data-kind="taco"] {
+  background-color: #dce2c6;
+}
+.pw-inner {
+  padding-top: 1rem;
+}
+.pw-bench {
+  --carton: min(32vw, 25rem, 45svh);
+  height: calc(var(--carton) * 2.09);
+  touch-action: pan-y;
+}
+.pw-cloth {
+  pointer-events: none;
+  position: absolute;
+  left: 4%;
+  bottom: 8%;
+  width: 46%;
+  height: 33%;
+  border-radius: 0.28rem 0.6rem 0.15rem 0.15rem;
+  transform: rotate(-19deg) skewX(5deg);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 9%, #87354622 9% 18%),
+    repeating-linear-gradient(0deg, #f8e9cf 0 9%, #d7aaa0 9% 18%);
+  box-shadow:
+    inset 0 0 0 3px #fcf0d982,
+    3px 5px 6px #74493824;
+  border-bottom: 4px double #d4b39b;
+}
+.pw-pinch {
+  pointer-events: none;
+  position: absolute;
+  top: 22%;
+  right: 2%;
+  width: clamp(54px, 7vw, 102px);
+  aspect-ratio: 1.1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(
+    ellipse,
+    #dfc19c 0 48%,
+    #fff4d8 63% 68%,
+    #bbaa8a 70%,
+    #fff4de 73%
+  );
+  box-shadow: 4px 7px 9px #51392e30;
+  transform: rotate(12deg);
+}
+.pw-pinch img {
+  width: 60%;
+  height: 65%;
+  object-fit: contain;
+  filter: drop-shadow(2px 3px 2px #54331644);
+}
+.pw-ticket {
+  position: absolute;
+  right: 0;
+  bottom: 7%;
+  width: clamp(104px, 10vw, 144px);
+  padding: 0.85rem 0.7rem 1rem;
+  display: grid;
+  gap: 0.3rem;
+  transform: rotate(8deg);
+  border-top: 4px solid #8b3a42;
+  background: #fff7dd;
+  box-shadow: 3px 6px 8px #52382622;
+  color: #5c4034;
+  pointer-events: none;
+}
+.pw-ticket span {
+  font:
+    600 1.12rem/1.1 "Dancing Script",
+    cursive;
+  color: #843240;
+}
+.pw-ticket strong {
+  font:
+    650 0.75rem/1.25 Inter,
+    sans-serif;
+  border-bottom: 1px dashed #a68b70;
+  padding-bottom: 0.35rem;
+}
+.pw-ticket small {
+  font:
+    0.69rem/1.35 ui-monospace,
+    monospace;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pw-parcel {
+  width: min(78%, 29rem);
+  position: relative;
+  border: 6px solid #cda474;
+  border-radius: 8% 8% 12% 12%;
+  background: repeating-conic-gradient(#efd1b5 0 25%, #fff2dc 0 50%) 0 0 / 25px
+    25px;
+  box-shadow:
+    inset 0 3px 4px #fff9,
+    0 8px #af7953,
+    2px 18px 22px #6e432332;
+  transform: perspective(900px) rotateY(var(--lean, 0deg));
+  overflow: hidden;
+}
+.pw-parcel .kitchen-preview {
+  background: transparent;
+}
+.pw-parcel .kitchen-food {
+  width: min(100%, 21rem);
+}
+.pw-slide[data-stage="boxed"] .pw-parcel .kitchen-preview {
+  visibility: hidden;
+}
+.pw-wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    153deg,
+    #e1bf8c 0 44%,
+    #bc9367 45%,
+    #dfc6a1 46% 70%,
+    #c8a57b 71%,
+    #ecd0a5 72%
+  );
+  box-shadow: inset 0 0 0 3px #ae865e;
+}
+.pw-wrap img {
+  width: 48%;
+  mix-blend-mode: multiply;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pw-slide:not([hidden]) .pw-inner {
+    animation: pw-enter 0.33s ease-out both;
+  }
+  @keyframes pw-enter {
+    from {
+      opacity: 0.4;
+      transform: translateX(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+@media (max-width: 760px) {
+  .pw-bench {
+    --carton: min(49vw, 17rem);
+    height: calc(var(--carton) * 2.14);
+  }
+  .pw-pinch {
+    right: 2%;
+    top: 19%;
+    width: 14%;
+  }
+  .pw-ticket {
+    width: 25%;
+    right: 0;
+    bottom: 3%;
+    padding: 0.44rem;
+  }
+  .pw-ticket small {
+    font-size: 0.6rem;
+  }
+  .pw-ticket span {
+    font-size: 0.94rem;
+  }
+  .pw-parcel {
+    width: 68%;
+    margin-right: 4%;
+  }
+  .pw-parcel .kitchen-food {
+    width: min(100%, 15rem);
+  }
+  .pw-cloth {
+    left: 4%;
+  }
+  .pw-inner {
+    padding-top: 1rem;
+  }
+  .pw-switch button {
+    min-height: 40px;
+  }
+}
+
+@media (min-width: 761px) and (max-height: 740px) {
+  .pw-switch {
+    margin-top: 0.65rem;
+  }
+  .pw-inner {
+    padding-block: 0.55rem 1rem;
+  }
+  .pw-bench {
+    --carton: min(32vw, 25rem, calc((100svh - 5.8rem) / 2.09));
+  }
+  .pinky-site .pw-head h2 {
+    max-width: 11ch;
+    font-size: clamp(2.75rem, 4.6vw, 4.2rem);
   }
 }

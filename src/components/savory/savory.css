@@ -53,3 +53,28 @@
   .savory-moments {gap:.25rem;} .savory-moments button {padding:.45rem .7rem;}
 }
 @media(prefers-reduced-motion:reduce) {.savory-camera {transform:none;}}
+
+/* The bowl is the fixed point of reference; only the lifted bite moves closer. */
+.savory-camera,.savory-bowl{transform:none}
+.savory-lift{transform:translate3d(calc(var(--lift)*-4%),var(--stick-y),0) rotate(var(--tilt)) scale(calc(.95 + (var(--camera) - 1)*.54));transform-origin:36% 43%}
+.savory-strands-near{clip-path:inset(45% 68% 0 0);transform:skewX(var(--sway)) scaleY(var(--length))}
+.savory-strands-far{clip-path:inset(45% 0 0 31.9%);transform:skewX(calc(var(--sway)*.35)) scaleY(calc(.34 + var(--length)*.66))}
+.savory-steam{position:absolute;left:38%;bottom:37%;width:28%;height:29%;pointer-events:none}
+.savory-steam i{--p:var(--steam-phase);position:absolute;inset:0 42% 0 0;border-left:4px solid #fff5d9;border-radius:50%;filter:blur(2px);opacity:calc(.38 - var(--p)*.37);transform:translateY(calc(var(--p)*-67%)) rotate(calc(-11deg + var(--p)*25deg))}
+.savory-steam i+i{--p:var(--steam-late);left:42%;right:8%}
+.savory-scroll-hint{display:none;color:#684132;font-size:.84rem}
+@media (min-height:450px) and (prefers-reduced-motion:no-preference){
+  .savory-course{height:590svh;min-height:0}
+  .savory-stage{position:sticky;top:0;height:100svh;min-height:0}
+  .savory-scroll-hint{display:block;position:absolute;bottom:calc(100% + .6rem);left:0}
+}
+@media(max-width:800px) and (min-height:450px) and (prefers-reduced-motion:no-preference){
+  .savory-course{height:510svh}
+  .savory-stage{display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:clamp(.7rem,3svh,2rem) 0 .8rem;grid-template-columns:1fr}
+  .savory-art{aspect-ratio:auto;align-self:stretch}
+  .savory-camera{width:min(94%,37rem,calc(1.22 * (100svh - 17rem)));bottom:1%;right:4%}
+  .savory-controls{gap:.35rem}.savory-scroll-hint{position:static;flex-basis:100%}
+}
+@media(min-width:801px) and (max-height:680px){.savory-camera{width:min(85%,82svh)}.savory-stage{padding-top:1.5rem}}
+@media(max-height:600px) and (max-width:800px){.savory-description{font-size:.9rem;line-height:1.35;min-height:0}.pinky-site .savory-copy h2{font-size:2.3rem}.savory-controls button{min-height:36px}.savory-stage{padding-top:.6rem}}
+@media(prefers-reduced-motion:reduce){.savory-steam{display:none}}

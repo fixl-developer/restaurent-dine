@@ -15,8 +15,8 @@ import "./savory.css";
 function liftTime(height: number) {
   const targetY = 39 - 46 * Math.max(0, Math.min(1, height));
   // Match the drag distance to the rendered chopstick position on the rising part of the film.
-  let start = 6,
-    end = 15;
+  let start = 8,
+    end = 26;
   for (let i = 0; i < 12; i++) {
     const middle = (start + end) / 2;
     if (poseAt(middle).y > targetY) start = middle;
@@ -27,7 +27,7 @@ function liftTime(height: number) {
 
 export default function SavoryCourse() {
   const section = useRef<HTMLElement>(null);
-  const manual = useRef(false);
+  const stage = useRef<HTMLDivElement>(null);
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const playFrom = useRef(0);
@@ -50,73 +50,99 @@ export default function SavoryCourse() {
   const moment = chapters[active];
   const pose = poseAt(time);
 
+  function seek(value: number) {
+    const track = section.current;
+    const frame = stage.current;
+    if (track && frame && getComputedStyle(frame).position === "sticky") {
+      const travel = track.offsetHeight - frame.offsetHeight;
+      window.scrollTo({
+        top:
+          window.scrollY +
+          track.getBoundingClientRect().top +
+          (travel * value) / duration,
+        behavior: "instant",
+      });
+    }
+    setTime(value);
+  }
+
   useEffect(() => {
     if (!playing) return;
     const started = performance.now();
     let frame = 0;
+    const stop = () => setPlaying(false);
     function tick(now: number) {
-      const elapsed = playFrom.current + (now - started) / 1000;
-      setTime(Math.min(duration, elapsed));
-      if (elapsed >= duration) setPlaying(false);
+      const elapsed = Math.min(
+        duration,
+        playFrom.current + (now - started) / 1000,
+      );
+      seek(elapsed);
+      if (elapsed >= duration) stop();
       else frame = requestAnimationFrame(tick);
     }
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    window.addEventListener("wheel", stop, { passive: true });
+    window.addEventListener("touchstart", stop, { passive: true });
+    window.addEventListener("keydown", stop);
+    document.addEventListener("visibilitychange", stop);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchstart", stop);
+      window.removeEventListener("keydown", stop);
+      document.removeEventListener("visibilitychange", stop);
+    };
   }, [playing]);
 
   useEffect(() => {
-    const node = section.current;
-    if (!node) return;
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let visible = false;
-    let frame = 0;
+    const node = section.current,
+      frame = stage.current;
+    if (!node || !frame) return;
+    let visible = false,
+      scheduled = 0;
     function update() {
-      frame = 0;
-      if (!node || manual.current || motion.matches || !visible) return;
-      const rect = node.getBoundingClientRect();
-      const travel = Math.max(
-        rect.height - window.innerHeight,
-        window.innerHeight * 0.6,
-      );
-      setTime(Math.max(0, Math.min(1, -rect.top / travel)) * duration);
+      scheduled = 0;
+      if (!frame || !node || getComputedStyle(frame).position !== "sticky")
+        return;
+      const travel = node.offsetHeight - frame.offsetHeight;
+      if (travel > 0)
+        setTime(
+          duration *
+            Math.max(
+              0,
+              Math.min(1, -node.getBoundingClientRect().top / travel),
+            ),
+        );
     }
     function schedule() {
-      if (visible && !frame) frame = requestAnimationFrame(update);
+      if (visible && !scheduled) scheduled = requestAnimationFrame(update);
     }
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      if (!visible) {
-        setPlaying(false);
-        manual.current = false;
-      }
+      if (!visible) setPlaying(false);
       schedule();
     });
-    const pauseWhenHidden = () => {
-      if (document.hidden) setPlaying(false);
-    };
-    const motionChanged = () => {
-      if (motion.matches) setPlaying(false);
+    const motion = matchMedia("(prefers-reduced-motion: reduce)");
+    const changed = () => {
+      setPlaying(false);
       schedule();
     };
-    document.addEventListener("visibilitychange", pauseWhenHidden);
     observer.observe(node);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
-    motion.addEventListener("change", motionChanged);
+    motion.addEventListener("change", changed);
     return () => {
-      document.removeEventListener("visibilitychange", pauseWhenHidden);
+      cancelAnimationFrame(scheduled);
       observer.disconnect();
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
+      motion.removeEventListener("change", changed);
       window.removeEventListener("resize", schedule);
-      motion.removeEventListener("change", motionChanged);
+      window.removeEventListener("scroll", schedule);
     };
   }, []);
 
   function inspect(value: number) {
-    manual.current = true;
     setPlaying(false);
-    setTime(value);
+    seek(value);
   }
 
   function startLift(event: PointerEvent<HTMLButtonElement>) {
@@ -131,7 +157,6 @@ export default function SavoryCourse() {
       moved: false,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
-    manual.current = true;
     setPlaying(false);
     setDragging(true);
   }
@@ -147,7 +172,7 @@ export default function SavoryCourse() {
   function endLift(event: PointerEvent<HTMLButtonElement>) {
     if (drag.current?.id !== event.pointerId) return;
     if (event.type === "pointerup" && !drag.current.moved)
-      inspect(pose.y > 10 ? 15 : 6);
+      inspect(pose.y > 10 ? 26 : 8);
     drag.current = null;
     setDragging(false);
   }
@@ -157,8 +182,7 @@ export default function SavoryCourse() {
       setPlaying(false);
       return;
     }
-    const start = manual.current && time < duration ? time : 0;
-    manual.current = true;
+    const start = time < duration - 0.05 ? time : 0;
     playFrom.current = start;
     setTime(start);
     setPlaying(true);
@@ -171,7 +195,7 @@ export default function SavoryCourse() {
       id="savory-course"
       aria-labelledby="savory-title"
     >
-      <div className="savory-stage" data-dragging={dragging}>
+      <div ref={stage} className="savory-stage" data-dragging={dragging}>
         <div className="savory-copy">
           <p className="savory-kicker">From the wok</p>
           <h2 id="savory-title">
@@ -201,6 +225,11 @@ export default function SavoryCourse() {
             {
               "--lift": (39 - pose.y) / 46,
               "--camera": pose.zoom,
+              "--sway":
+                Math.sin(time * 0.53) * Math.max(0, (38 - pose.y) / 46) * 5 +
+                "deg",
+              "--steam-phase": (time % 5) / 5,
+              "--steam-late": ((time + 2.1) % 5) / 5,
               "--stick-y": pose.y + "%",
               "--tilt": pose.tilt + "deg",
               "--length": pose.length,
@@ -221,6 +250,10 @@ export default function SavoryCourse() {
               width="900"
               height="559"
             />
+            <div className="savory-steam" aria-hidden="true">
+              <i />
+              <i />
+            </div>
             <div className="savory-lift">
               <img
                 className="savory-grip"
@@ -231,7 +264,15 @@ export default function SavoryCourse() {
                 height="718"
               />
               <img
-                className="savory-strands"
+                className="savory-strands savory-strands-near"
+                src="/savory/lift.webp"
+                alt=""
+                loading="lazy"
+                width="880"
+                height="718"
+              />
+              <img
+                className="savory-strands savory-strands-far"
                 src="/savory/lift.webp"
                 alt=""
                 loading="lazy"
@@ -251,7 +292,7 @@ export default function SavoryCourse() {
             onPointerCancel={endLift}
             onLostPointerCapture={endLift}
             onClick={(e) => {
-              if (e.detail === 0) inspect(pose.y > 10 ? 15 : 6);
+              if (e.detail === 0) inspect(pose.y > 10 ? 26 : 8);
             }}
             onKeyDown={(e) => {
               if (e.key === "ArrowUp" || e.key === "ArrowDown") {
@@ -273,6 +314,9 @@ export default function SavoryCourse() {
           </span>
         </div>
         <div className="savory-controls">
+          <span className="savory-scroll-hint">
+            Scroll to lift <span aria-hidden="true">↓</span>
+          </span>
           <div
             className="savory-moments"
             role="group"
