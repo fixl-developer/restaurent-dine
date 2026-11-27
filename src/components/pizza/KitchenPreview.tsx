@@ -63,13 +63,17 @@ export default function KitchenPreview({
   choices,
   scale,
   patties = 1,
+  packed,
 }: {
   kind: KitchenKind;
   choices: { pizzaArt?: IngredientArt | null }[];
   scale: number;
   patties?: number;
+  packed?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [folded, setFolded] = useState(false);
+  const wrapped = packed ?? folded;
   const [turns, setTurns] = useState(0);
   const selected = new Set<string>(
     choices.flatMap((m) => (m.pizzaArt ? [m.pizzaArt] : [])),
@@ -88,7 +92,7 @@ export default function KitchenPreview({
   const taco = tacoOrder.filter(
     (art) => art === "tortilla" || art === "beans" || selected.has(art),
   );
-  const separation = open ? 19 : 0;
+  const separation = open && !wrapped ? 19 : 0;
   const height =
     burger.reduce((sum, part) => sum + burgerRise[part], 0) +
     separation * (burger.length - 1);
@@ -98,8 +102,13 @@ export default function KitchenPreview({
   let offset = 0;
   let pattyIndex = 0;
   return (
-    <div className={"kitchen-preview kitchen-" + kind}>
-      <div className={kind === "burger" ? "burger-setting" : "taco-setting"}>
+    <div className={"kitchen-preview kitchen-" + kind} data-packed={wrapped}>
+      <div
+        className={
+          "service-setting " +
+          (kind === "burger" ? "burger-setting" : "taco-setting")
+        }
+      >
         {kind === "burger" && (
           <div className="burger-contact" aria-hidden="true" />
         )}
@@ -147,32 +156,94 @@ export default function KitchenPreview({
             </div>
           )}
         </div>
+        {wrapped && (
+          <div
+            className={"packed-food packed-" + kind}
+            role="img"
+            aria-label={
+              kind === "burger"
+                ? "Burger sealed in silver foil"
+                : "Folded taco in a paper sleeve with " +
+                  taco.slice(1).join(", ")
+            }
+          >
+            <img
+              className="parcel-photo"
+              alt=""
+              src={
+                kind === "burger"
+                  ? "/kitchen/burger-foil.webp"
+                  : "/kitchen/taco-sleeve.webp"
+              }
+            />
+            {kind === "burger" ? (
+              <img alt="" className="parcel-seal" src="/brand/logo.png" />
+            ) : (
+              <div className="taco-pocket">
+                {taco.slice(2).map((part, index) => (
+                  <img
+                    key={part}
+                    alt=""
+                    data-filling={part}
+                    src={"/kitchen/taco-" + part + "." + partExt(part)}
+                    style={{
+                      left: 16 + index * 5 + "%",
+                      bottom: 27 + index * 7 + "%",
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      {kind === "burger" ? (
-        <button
-          type="button"
-          className="kitchen-inspect"
-          aria-pressed={open}
-          aria-label={
-            (open ? "Close the stack" : "Lift the layers") +
-            ", " +
-            patties +
-            (patties === 1 ? " patty" : " patties")
-          }
-          onClick={() => setOpen(!open)}
-        >
-          <Layers size={15} />
-          {open ? "Close the stack" : "Lift the layers"}
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="kitchen-inspect"
-          onClick={() => setTurns((n) => n + 1)}
-        >
-          <RotateCw size={15} />
-          Turn the taco
-        </button>
+      {!packed && (
+        <div className="kitchen-tools">
+          {kind === "burger" ? (
+            <button
+              type="button"
+              className="kitchen-inspect"
+              aria-pressed={open}
+              aria-label={
+                (open ? "Close the stack" : "Lift the layers") +
+                ", " +
+                patties +
+                (patties === 1 ? " patty" : " patties")
+              }
+              disabled={wrapped}
+              onClick={() => setOpen(!open)}
+            >
+              <Layers size={15} />
+              {open ? "Close the stack" : "Lift the layers"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="kitchen-inspect"
+              disabled={wrapped}
+              onClick={() => setTurns((n) => n + 1)}
+            >
+              <RotateCw size={15} />
+              Turn the taco
+            </button>
+          )}
+          {packed === undefined && (
+            <button
+              type="button"
+              className="kitchen-inspect"
+              aria-pressed={folded}
+              onClick={() => setFolded(!folded)}
+            >
+              {kind === "burger"
+                ? folded
+                  ? "Unwrap burger"
+                  : "Wrap in foil"
+                : folded
+                  ? "Open tortilla"
+                  : "Fold taco"}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

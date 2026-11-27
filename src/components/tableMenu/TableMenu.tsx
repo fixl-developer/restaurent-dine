@@ -4,7 +4,8 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Coffee } from "lucide-re
 import { usePublicMenu } from "@/hooks/useGuest";
 import { useCurrencyFormatter } from "@/hooks/useCurrencyFormatter";
 import { startingPrice } from "@/components/counter/menuDisplay";
-import { PageTurn, usePageTurn } from "@/components/menuBook/PageTurn";
+import { useBookDrag } from "@/components/menuBook/useBookDrag";
+import { BookHands, PageTurn, usePageTurn } from "@/components/menuBook/PageTurn";
 import type { PublicMenuItem } from "@/lib/dto/guest";
 import DishArtwork from "@/components/menuBook/DishArtwork";
 import "./tableMenu.css";
@@ -20,9 +21,13 @@ export default function TableMenu() {
   );
   const index = Math.max(0, pages.findIndex(({ item }) => item.id === selection));
   const page = pages[index];
-  const { turn: sheet, shown } = usePageTurn(page?.item, item => pages.findIndex(entry => entry.item.id === item.id));
-  const picture = sheet?.forward ? sheet.from : page?.item;
-  const entry = sheet && !sheet.forward ? sheet.from : page?.item;
+  const { turn: autoTurn, shown, settle } = usePageTurn(page?.item, item => pages.findIndex(entry => entry.item.id === item.id));
+  const drag = useBookDrag(page?.item, pages[index - 1]?.item, pages[index + 1]?.item, !!autoTurn, item => {
+    setOpened(true); settle(item); setSelection(item.id);
+  });
+  const sheet = drag.sheet || autoTurn;
+  const picture = sheet?.forward ? sheet.from : sheet?.to ?? page?.item;
+  const entry = sheet && !sheet.forward ? sheet.from : sheet?.to ?? page?.item;
 
   function print(item: PublicMenuItem) {
     return <div className="tm-print">
@@ -87,9 +92,9 @@ export default function TableMenu() {
         <h2 id="table-menu-heading">The table menu</h2>
         <Link to="/menu">Full menu <ArrowUpRight size={17} /></Link>
       </div>
-      <div className="tm-stage" ref={stage} data-open={opened}>
+      <div className="tm-stage" ref={stage} data-open={opened || !!drag.sheet}>
         <div className="tm-room" aria-hidden="true" />
-        <div className="tm-book">
+        <div className="tm-book book-draggable" {...drag.handlers} style={drag.style} data-scrubbing={!!drag.sheet}>
           <div className="tm-paper">
             {entry ? print(entry) : <div className="tm-print"><BookOpen aria-hidden="true" /><p role="status">{status}</p></div>}
           </div>
@@ -102,6 +107,7 @@ export default function TableMenu() {
           {sheet && <PageTurn key={sheet.to.id} forward={sheet.forward}
             front={<div className="tm-sheet-text">{print(sheet.forward ? sheet.from : sheet.to)}</div>}
             back={<div className="tm-sheet-art"><DishArtwork item={sheet.forward ? sheet.to : sheet.from} /></div>} />}
+          <BookHands turning={!!sheet} forward={sheet?.forward} pageId={sheet?.to.id} />
         </div>
       </div>
       <div className="tm-controls">

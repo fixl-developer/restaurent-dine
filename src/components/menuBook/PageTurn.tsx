@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import "./pageTurn.css";
 
 type Turn<T> = { from: T; to: T; forward: boolean };
@@ -14,16 +8,6 @@ export function usePageTurn<T extends { id: string }>(
   target: T | undefined,
   rank: (item: T) => number,
 ) {
-  const hasPage = Boolean(target);
-  useEffect(() => {
-    if (
-      hasPage &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      const hand = new Image();
-      hand.src = "/kitchen/page-hand.webp";
-    }
-  }, [hasPage]);
   const [settled, setSettled] = useState(target);
   const [turn, setTurn] = useState<Turn<T> | null>(null);
   const forward = settled && target ? rank(target) >= rank(settled) : true;
@@ -50,7 +34,7 @@ export function usePageTurn<T extends { id: string }>(
       motion.removeEventListener("change", finish);
     };
   }, [target, settled, forward]);
-  return { turn, shown: turn?.from ?? target };
+  return { turn, shown: turn?.from ?? target, settle: setSettled };
 }
 
 export function PageTurn({
@@ -62,11 +46,33 @@ export function PageTurn({
   front: ReactNode;
   back: ReactNode;
 }) {
+  return (
+    <div
+      className={"book-leaf " + (forward ? "book-forward" : "book-backward")}
+      aria-hidden="true"
+      inert
+    >
+      <i className="book-grip-point" />
+      <div className="book-face">{front}</div>
+      <div className="book-face book-verso">{back}</div>
+    </div>
+  );
+}
+
+export function BookHands({
+  forward = true,
+  turning,
+  pageId,
+}: {
+  forward?: boolean;
+  turning: boolean;
+  pageId?: string;
+}) {
   const hands = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const overlay = hands.current;
     const book = overlay?.parentElement;
-    if (!book || !overlay) return;
+    if (!turning || !book || !overlay) return;
     const markers = Array.from(
       book.querySelectorAll<HTMLElement>(".book-grip-point"),
     );
@@ -91,28 +97,18 @@ export function PageTurn({
     }
     followEdge();
     return () => cancelAnimationFrame(frame);
-  }, [forward]);
+  }, [forward, turning, pageId]);
   return (
-    <>
-      <div
-        className={"book-leaf " + (forward ? "book-forward" : "book-backward")}
-        aria-hidden="true"
-        inert
-      >
-        <i className="book-grip-point" />
-        <div className="book-face">{front}</div>
-        <div className="book-face book-verso">{back}</div>
-      </div>
-      <div
-        ref={hands}
-        className="book-hands"
-        data-forward={forward}
-        aria-hidden="true"
-        inert
-      >
-        <i className="book-anchor-hand" />
-        <i className="book-moving-hand" />
-      </div>
-    </>
+    <div
+      ref={hands}
+      className="book-hands"
+      data-forward={forward}
+      data-turning={turning}
+      aria-hidden="true"
+      inert
+    >
+      <i className="book-anchor-hand" />
+      <i className="book-moving-hand" />
+    </div>
   );
 }

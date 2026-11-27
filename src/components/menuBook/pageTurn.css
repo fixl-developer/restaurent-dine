@@ -45,7 +45,6 @@
   left: var(--grip-x, 98%);
   top: var(--grip-y, 77%);
   translate: -3% -10%;
-  animation: book-fingers 760ms cubic-bezier(.42,.06,.26,.96) both;
 }
 .book-hands .book-anchor-hand {
   transform-origin: center;
@@ -53,21 +52,19 @@
   top: 85%;
   scale: -1 1;
 
-  animation: book-steady 760ms ease-in-out both;
 }
 .book-hands[data-forward="false"] .book-moving-hand { scale: -1 1; }
 .book-hands[data-forward="false"] .book-anchor-hand { left: 93%; right: auto; scale: 1; }
-@keyframes book-fingers {
-  0% { opacity: 0; transform: rotate(18deg); }
-  14% { opacity: 1; transform: rotate(12deg); }
-  48% { opacity: 1; transform: rotate(24deg); }
-  83% { opacity: 1; transform: rotate(42deg); }
-  100% { opacity: 0; transform: rotate(53deg); }
-}
-@keyframes book-steady {
-  0%, 100% { opacity: 0; transform: translateY(16%); }
-  18%, 80% { opacity: 1; transform: translateY(0); }
-}
+.book-draggable { touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
+.book-draggable img { -webkit-user-drag: none; }
+.book-draggable[data-scrubbing=true] { cursor: grabbing; }
+.book-draggable[data-scrubbing=true] .book-leaf { animation: none; transform: translateZ(2px) rotateY(var(--sheet-angle)); }
+.book-draggable[data-scrubbing=true] .mb-mobile-sheet { animation: none; transform: perspective(1100px) rotateY(var(--mobile-angle)); }
+.book-draggable[data-scrubbing=true] .book-face::after { animation: none; opacity: .2; }
+.book-hands[data-turning=false] .book-moving-hand { left: 91%; top: 81%; transform: rotate(15deg); }
+.book-hands[data-turning=true] .book-moving-hand { transform: rotate(20deg); }
 @media (prefers-reduced-motion: reduce) {
-  .book-hands { display: none; }
+  .book-hands { display: block; }
+  .book-hands[data-turning=true] .book-moving-hand { left: 91%; top: 81%; }
+  .book-draggable[data-scrubbing=true] :is(.book-leaf, .mb-mobile-sheet, .mb-mobile-base) { display: none; }
 }

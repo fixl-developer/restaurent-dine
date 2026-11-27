@@ -152,14 +152,14 @@
   }
 }
 
-.taco-setting { display: contents; }
-.kitchen-preview.kitchen-burger {
+
+.kitchen-preview:is(.kitchen-burger,.kitchen-taco) {
   position: relative;
   padding: 0;
   gap: 0;
   background: #62442e;
 }
-.burger-setting {
+.service-setting {
   position: relative;
   width: 100%;
   aspect-ratio: 3 / 2;
@@ -186,7 +186,8 @@
   transform: translateX(-47%) rotate(-2deg);
   background: radial-gradient(ellipse, #342017ac 5%, #51342182 40%, #674b2d35 57%, transparent 73%);
 }
-.kitchen-burger .kitchen-inspect {
+.kitchen-tools {
+  display: flex; gap: .35rem; justify-content: center;
   position: absolute;
   left: 50%;
   bottom: 4%;
@@ -195,10 +196,39 @@
   white-space: nowrap;
   box-shadow: 0 2px 8px #3621134a;
 }
-.pizza-stage:has(.kitchen-burger) {
+.pizza-stage:has(.service-setting) {
   background: #4c3426;
 }
 @media (max-width: 680px) {
-  .pizza-stage .kitchen-burger { max-height: min(31dvh, 17rem); }
-  .pizza-stage .burger-setting { width: min(100%, 46.5dvh, 25.5rem); }
+  .pizza-stage .kitchen-preview { max-height: min(31dvh, 17rem); }
+  .pizza-stage .service-setting { width: min(100%, 46.5dvh, 25.5rem); }
+}
+
+.service-setting .packed-food { position: absolute; left: 50%; bottom: 30%; width: 44%; translate: -50% 0; filter: drop-shadow(2px 4px 3px #40270f70); }
+.parcel-photo { display: block; width: 100%; }
+.parcel-seal { position: absolute; width: 24%; top: 28%; left: 39%; aspect-ratio: 1; object-fit: contain; background: #fcf0d9; border-radius: 50%; transform: rotate(-12deg) scaleY(.74); }
+.kitchen-preview[data-packed=true] .kitchen-food { visibility: hidden; }
+.taco-setting .kitchen-food, .pw-parcel .taco-setting .kitchen-food { position: absolute; left: 50%; bottom: 15%; width: 53%; transform: translateX(-50%) scaleY(.61) scale(var(--portion)); }
+.taco-setting .taco-plate { background: transparent; box-shadow: none; filter: drop-shadow(2px 4px 2px #48260a66); }
+.service-setting .packed-taco { width: 47%; }
+.taco-pocket { position: absolute; inset: 0; clip-path: polygon(4% 78%,13% 46%,27% 24%,45% 5%,60% 3%,42% 17%,30% 38%,17% 75%,7% 84%); }
+.taco-pocket img { position: absolute; width: 38%; transform: translateX(-28%) rotate(-24deg); }
+.kitchen-tools button:disabled { opacity: .7; }
+@media (prefers-reduced-motion: no-preference) {
+  .packed-food { animation: pack-settle .45s ease-out both; transform-origin: center bottom; }
+  @keyframes pack-settle { from { opacity: .3; transform: scaleX(1.08) scaleY(.84) rotate(-3deg); } to { opacity: 1; transform: none; } }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kitchen-preview[data-packed=true] .kitchen-food { visibility: visible; animation: cover-food .44s ease-in forwards; }
+  .packed-burger { animation: foil-close .52s ease-out both; }
+  .packed-taco { animation-delay: .18s; }
+  @keyframes foil-close {
+    from { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); }
+    55% { clip-path: polygon(0 11%, 100% 46%, 100% 100%, 0 100%); }
+    to { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+  }
+  @keyframes cover-food { 0%, 35% { opacity: 1; } to { opacity: 0; } }
+  .kitchen-taco[data-packed=true] .taco-plate { animation: tortilla-fold .42s ease-in both; transform-origin: center 70%; }
+  @keyframes tortilla-fold { to { transform: perspective(420px) rotateX(-58deg) scaleX(.86); } }
 }

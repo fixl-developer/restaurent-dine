@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Utensils, Plus, Rotate3d } from "lucide-react";
 import { hasDishModel, startingPrice } from "@/components/counter/menuDisplay";
 import type { PublicCategory, PublicMenuItem } from "@/lib/dto/guest";
-import { PageTurn, usePageTurn } from "./PageTurn";
+import { useBookDrag } from "./useBookDrag";
+import { BookHands, PageTurn, usePageTurn } from "./PageTurn";
 import DishArtwork from "./DishArtwork";
 import "./menuBook.css";
 
@@ -23,8 +24,13 @@ export default function MenuBook({ collection, items, categories, formatPrice, q
   const index = Math.max(0, items.findIndex((item) => item.id === selection.id));
   const current = items[index];
   const all = categories.flatMap((category) => category.items);
-  const { turn, shown } = usePageTurn(current, (item) => all.findIndex((entry) => entry.id === item.id));
-  const gesture = useRef<{ x: number; y: number } | null>(null);
+  const { turn: autoTurn, shown, settle } = usePageTurn(current, (item) => all.findIndex((entry) => entry.id === item.id));
+  const drag = useBookDrag(current, items[index - 1], items[index + 1], !!autoTurn, item => {
+    settle(item);
+    setSelection({ collection, id: item.id });
+  });
+  const turn = drag.sheet || autoTurn;
+
 
   const dishRail = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -75,6 +81,7 @@ export default function MenuBook({ collection, items, categories, formatPrice, q
   }
 
   if (!current) return null;
+  const destination = turn?.to ?? current;
   return (
     <section className="mb-table" aria-label="Interactive menu book"
       onKeyDown={(event) => {
@@ -88,32 +95,23 @@ export default function MenuBook({ collection, items, categories, formatPrice, q
           if (button) { button.focus({ preventScroll: true }); button.click(); }
         } else move(step);
       }}>
-      <div className="mb-binding" onTouchStart={(event) => {
-        const touch = event.touches[0];
-        gesture.current = event.touches.length === 1 ? { x: touch.clientX, y: touch.clientY } : null;
-      }} onTouchCancel={() => { gesture.current = null; }} onTouchEnd={(event) => {
-        const start = gesture.current;
-        gesture.current = null;
-        if (!start || event.touches.length) return;
-        const dx = event.changedTouches[0].clientX - start.x;
-        const dy = event.changedTouches[0].clientY - start.y;
-        if (Math.abs(dx) > 55 && Math.abs(dx) > 1.6 * Math.abs(dy)) move(dx < 0 ? 1 : -1);
-      }}>
-        <div className="mb-spread" data-turning={Boolean(turn)}>
-          <DishArtwork key={(turn?.forward ? turn.from : current).id} item={turn?.forward ? turn.from : current} interactive={!turn} />
-          <div className="mb-text-page" inert={Boolean(turn)}>{details(turn && !turn.forward ? turn.from : current)}</div>
+      <div className="mb-binding">
+        <div className="mb-spread book-draggable" {...drag.handlers} style={drag.style} data-scrubbing={!!drag.sheet} data-turning={Boolean(turn)}>
+          <DishArtwork key={(turn?.forward ? turn.from : destination).id} item={turn?.forward ? turn.from : destination} interactive={!turn} />
+          <div className="mb-text-page" inert={Boolean(turn)}>{details(turn && !turn.forward ? turn.from : destination)}</div>
           {turn && <PageTurn key={turn.to.id} forward={turn.forward}
-            front={details(turn.forward ? turn.from : current, true)}
-            back={<DishArtwork item={turn.forward ? current : turn.from} />} />}
+            front={details(turn.forward ? turn.from : destination, true)}
+            back={<DishArtwork item={turn.forward ? destination : turn.from} />} />}
           {turn && <div key={'mobile-' + turn.to.id} className={'mb-mobile-sheet ' + (turn.forward ? 'mb-out' : 'mb-in')} aria-hidden="true" inert>
             <i className="book-grip-point" />
-            <DishArtwork item={turn.forward ? turn.from : current} />
-            {details(turn.forward ? turn.from : current, true)}
+            <DishArtwork item={turn.forward ? turn.from : destination} />
+            {details(turn.forward ? turn.from : destination, true)}
           </div>}
           {turn && <div className="mb-mobile-base" aria-hidden="true" inert>
-            <DishArtwork item={turn.forward ? current : turn.from} />
-            {details(turn.forward ? current : turn.from, true)}
+            <DishArtwork item={turn.forward ? destination : turn.from} />
+            {details(turn.forward ? destination : turn.from, true)}
           </div>}
+          <BookHands turning={!!turn} forward={turn?.forward} pageId={turn?.to.id} />
         </div>
       </div>
       {items.length > 1 && <div className="mb-dish-rail" ref={dishRail} role="navigation" aria-label="Jump to a dish">

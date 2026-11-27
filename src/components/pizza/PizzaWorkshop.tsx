@@ -42,7 +42,7 @@ const kitchens = {
     dress: "Build your burger, then lift the layers for a closer look.",
     cook: "Grill my burger",
     cooking: "Grilling…",
-    ready: "Off the grill. Fold the checkerboard wrap around your stack.",
+    ready: "Off the grill. Seal the stack in silver foil.",
     pack: "Wrap the burger",
     base: "Bun & patty",
   },
@@ -319,17 +319,10 @@ function Workbench({
                   kind={kind}
                   choices={selectedOptions}
                   scale={1}
+                  packed={stage === "boxed"}
                 />
               )}
-              {stage === "boxed" && (
-                <div className="pw-wrap">
-                  <img
-                    src="/brand/logo.png"
-                    alt="Pinky Promise Café"
-                    loading="lazy"
-                  />
-                </div>
-              )}
+
             </div>
           )}
           <aside className="pw-ticket" aria-label="Current recipe">
